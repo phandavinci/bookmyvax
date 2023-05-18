@@ -1,0 +1,9 @@
+body{
+  background-color:aliceblue;
+}
+
+.center{
+  position: relative;
+  align-items: center;
+  text-align: center;
+}

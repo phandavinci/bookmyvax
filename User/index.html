@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Vaccination</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link href="style.css" rel="stylesheet">
+    <link href="indexstyle.css" rel="stylesheet">
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+  </head>
+  <body class="text-center">
+    <main class="form-signin">
+      <form action="home/home.html">
+          <!-- <img class="mb-4" src="logo-no-background.png" alt="" width="300" height="50"> -->
+          <!-- <h1 class="h3 mb-3 fw-normal">Please sign in</h1> -->
+          <!-- <div class="alert alert-danger" role="alert">
+              There is an error in your credentials. Please check it.
+          </div>
+          <div class="alert alert-success" role="alert">
+              Signup success, please sign in to continue.
+          </div> -->
+          <!-- <label for="inputUsername" class="visually-hidden"><b>Username</label> -->
+          <input type="text" name="mbno" id="inputmbno" class="form-control" placeholder="Mobile Number" required autofocus/><br>
+          <!-- <label for="inputPassword" class="visually-hidden">Password</label> -->
+          <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required/>
+          <input type="hidden" id="auth" name="type" value="login">
+          <div class="checkbox mb-3">
+          <label>
+              <input type="checkbox" value="1" name="remember"> Remember me
+          </label>
+          </div>
+          <input class="w-100 btn btn-lg btn-success" type="submit" value="Sign In">
+
+          <a class="mt-1 w-100 btn btn-lg btn-primary" href="signup/signup.html">Sign up</a>
+      </form>
+    </main>
+    <footer style="position: absolute; bottom: 0; right: 0">
+      <a href="../Admin/index.html">For Admin Login</a>
+    </footer>
+  </body>
+</html>
