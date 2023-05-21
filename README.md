@@ -1,5 +1,5 @@
 
-## BookMyVaccine
+## BookMyVaX
 
 ![LOGO](readmefiles/logo.jpg)
 
