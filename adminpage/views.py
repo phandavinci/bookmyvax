@@ -91,7 +91,7 @@ def adminadd(request):
         pincode = request.GET.get('pincode')
         whfrom = request.GET.get('whfrom')
         whto = request.GET.get('whto')
-        return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
+        # return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
         
         try:
             c = admindetails.objects.create(

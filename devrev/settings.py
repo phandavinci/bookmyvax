@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'user',
     'centers',
     'adminpage',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
