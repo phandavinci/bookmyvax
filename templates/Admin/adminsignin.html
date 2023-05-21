@@ -1,0 +1,19 @@
+<form method="POST">
+    {% csrf_token %}
+        {% if messages%}
+        <ul class='messages'></ul>
+            {% for message in messages%}
+            <li>{{message}}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    <p>Username</p>
+    <input type="text" name="username" placeholder="Enter Username" required autofocus/>
+    <p>Password</p>
+    <input type="password" name="password" placeholder="Enter Password" required>
+    <input type="submit" value='Sign In'>
+</form>
+<div class="adminpage" style="position:absolute; right:0; bottom:0;">
+    You are a User?
+    <a href="{% url 'usersignin' %}"><b>SignIn Here</b></a>
+</div>

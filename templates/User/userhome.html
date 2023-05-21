@@ -1,0 +1,46 @@
+{% extends 'User/usermain.html' %}
+
+
+
+{% block content %}
+
+{% if messages%}
+      <ul class='messages'></ul>
+        {% for message in messages%}
+          <li>{{message}}</li>
+          {% endfor %}
+      </ul>
+{% endif %}
+
+<div class="name">
+    <h2>Hello {{name}}</h2>
+</div>
+
+
+<div class="searchbar">
+    <form method='POST'>
+        {% csrf_token %}
+        <input class="bar" type="text" placeholder="  search for center's id, mobileno, address, city or pincode" name="search">
+        <button type="submit">Search</button> 
+    </form>
+</div>
+<div>
+    {% if rows %}
+        {% for row in rows %}
+            <br>
+            <form method='GET'>
+                {% csrf_token %}
+                <div name="id">ID: {{row.id}}</div>
+                <div name='name'>Name: {{row.name}}</div>
+                <div >Address: <br> {{row.line1}}, {{row.line2}}, {{row.city}}, {{row.pincode}} </div>
+                <div > {{row.mobileno}} </div>
+                <div >{{row.whfrom}} to {{row.whto}}</div>
+                <div class="vacancy">Vacancy: 8</div> 
+                <button name="book" value={{row.id}} type='submit'>Book</button>
+            </form>    
+            <br>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% endblock content %}
