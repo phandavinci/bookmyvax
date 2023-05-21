@@ -10,13 +10,13 @@
 <body>
     <div class="center">
         <form method='GET'>
-            Name:<input name='name' type="text"><br>
-            Mobile Number:<input name='mobileno' type="text"><br>
-            AddressLine1:<input name='line1' type="text"><br>
-            AddressLine2:<input name='line2' type="text"><br>
-            City:<input name='city'></input><br>
-            pincode:<input name='pincode'></input><br>
-            Working Hours:<br>From<input name='whfrom' type="text"><br>To<input name='whto' type="text"><br>
+            Name:<input name='name' type="text" maxlength='50'required/><br>
+            Mobile Number:<input name='mobileno' type="text" maxlength='10'required/><br>
+            AddressLine1:<input name='line1' type="text" maxlength='50'required/><br>
+            AddressLine2:<input name='line2' type="text" maxlength='50'required/><br>
+            City:<input name='city' maxlength='50'required/><br>
+            pincode:<input name='pincode' maxlength='6'required/><br>
+            Working Hours:<br>From<input name='whfrom' type="text" maxlength='7'required/><br>To<input name='whto' type="text" maxlength='7'required/><br>
             <input type="submit" value="Add">
             <input type="reset">
         </form>

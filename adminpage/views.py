@@ -91,10 +91,10 @@ def adminadd(request):
         pincode = request.GET.get('pincode')
         whfrom = request.GET.get('whfrom')
         whto = request.GET.get('whto')
-        # return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
+        #return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
         
         try:
-            c = admindetails.objects.create(
+            c = centersdb.objects.create(
                 name=name,
                 mobileno=mobileno,
                 line1 = line1,
@@ -106,8 +106,8 @@ def adminadd(request):
                 )
             c.save()
             messages.info(request, 'Successfully created')
-        except:
-            messages.error(request, 'An error occured')
+        except Exception as e:
+            messages.error(request, 'Sorry Unexpected Error Happened, Please Retry')
         return redirect('adminhome')
     return render(request, 'Admin/adminadd.html')
     
