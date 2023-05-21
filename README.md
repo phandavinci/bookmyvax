@@ -1,7 +1,7 @@
 
 ## BookMyVaccine
 
-![LOGO](https://github.com/phandavinci/DevRev/blob/main/readmefiles/logo.jpg?raw=true)
+![LOGO](readmefiles/logo.jpg)
 
 A web application for covid vaccination booking
 
@@ -123,4 +123,4 @@ Link for homepage:http://127.0.0.1:8000/usersignin
   
 ## Database Structure
 
-![DatabaseStructureImage](https://github.com/phandavinci/DevRev/blob/main/readmefiles/models.png?raw=true)
+![DatabaseStructureImage](readmefiles/models.png)
