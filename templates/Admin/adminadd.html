@@ -9,11 +9,14 @@
 </head>
 <body>
     <div class="center">
-        <form action="../success/success.html">
-            Name:<input type="text"><br>
-            Address:<textarea></textarea><br>
-            Mobile Number:<input type="text"><br>
-            Working Hours:<br>From<input type="time"><br>To<input type="time"><br>
+        <form method='GET'>
+            Name:<input name='name' type="text"><br>
+            Mobile Number:<input name='mobileno' type="text"><br>
+            AddressLine1:<input name='line1' type="text"><br>
+            AddressLine2:<input name='line2' type="text"><br>
+            City:<input name='city'></input><br>
+            pincode:<input name='pincode'></input><br>
+            Working Hours:<br>From<input name='whfrom' type="text"><br>To<input name='whto' type="text"><br>
             <input type="submit" value="Add">
             <input type="reset">
         </form>

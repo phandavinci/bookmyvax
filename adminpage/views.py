@@ -7,7 +7,6 @@ import base64
 import hashlib
 
 
-
 def hash_password(password):
     secret_key = 'sidfht34985ty34q8h58934y54hsdfngshtgdsgfn45023'
     user_data = str(password)
@@ -64,7 +63,7 @@ def adminsignin(request):
         # return HttpResponse(hash_password(password))
         try:
             user = admindetails.objects.get(username=username, password=hash_password(password))
-            response = HttpResponseRedirect("adminhome")
+            response = HttpResponseRedirect("/adminhome")
             response.set_cookie(key='admincookie', value=generate_cookie_value(username+password), path='/')
             user.cookiekey = generate_cookie_value(username+password)
             user.save()
@@ -81,4 +80,34 @@ def adminlogout(request):
     except:
         return response
     return response
+
+def adminadd(request):
+    if request.GET.get('name'):
+        name = request.GET.get('name')
+        mobileno = request.GET.get('mobileno')
+        line1 = request.GET.get('line1')
+        line2 = request.GET.get('line2')
+        city = request.GET.get('city')
+        pincode = request.GET.get('pincode')
+        whfrom = request.GET.get('whfrom')
+        whto = request.GET.get('whto')
+        return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
+        
+        try:
+            c = admindetails.objects.create(
+                name=name,
+                mobileno=mobileno,
+                line1 = line1,
+                line2 = line2,
+                city = city,
+                pincode = pincode,
+                whfrom = whfrom,
+                whto = whto
+                )
+            c.save()
+            messages.info(request, 'Successfully created')
+        except:
+            messages.error(request, 'An error occured')
+        return redirect('adminhome')
+    return render(request, 'Admin/adminadd.html')
     
