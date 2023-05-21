@@ -1,7 +1,7 @@
 
 ## BookMyVaccine
 
-![LOGO]("readmefiles/photo_2023-05-21_17-40-35.jpg")
+![LOGO](readmefiles/photo_2023-05-21_17-40-35.jpg)
 
 A web application for covid vaccination booking
 
@@ -123,4 +123,4 @@ Link for homepage:http://127.0.0.1:8000/usersignin
   
 ## Database Structure
 
-![DatabaseStructureImage]("readmefiles/models.png")
+![DatabaseStructureImage](readmefiles/models.png)
