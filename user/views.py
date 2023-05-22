@@ -30,11 +30,13 @@ def userhome(request):
     cookie = request.COOKIES.get('usercookie')
     if cookie:
         userno = UserSignIn.objects.get(cookiekey=cookie)
+        context = {'name':userno.name}
         if request.method == 'POST':
             query = request.POST.get('search')
             rows = matchingrows(query)
-            rows = {'rows':rows}
-            return render(request, 'User/userhome.html', rows)
+            context['rows']=rows
+            if query!='':
+                messages.info(request, 'Your search results for "'+query+'"')
         
         if request.GET.get('book'):
             id = request.GET.get('book')
@@ -44,8 +46,8 @@ def userhome(request):
                 userno = userno
             )
             c.save()
-            messages.info(request, "You successfully booked for vaccination at"+name.name+'  ID:'+id)
-        return render(request, 'User/userhome.html', {"name":userno.name})
+            messages.info(request, "You successfully booked for vaccination at '"+name.name+"'"+'  ID:'+id)
+        return render(request, 'User/userhome.html', context)
     return render(request, 'User/usersignin.html')
     
 

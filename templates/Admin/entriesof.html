@@ -1,0 +1,42 @@
+{% extends 'Admin/adminmain.html' %}
+
+
+
+{% block content %}
+
+{% if messages%}
+      <ul class='messages'></ul>
+        {% for message in messages%}
+          <li>{{message}}</li>
+          {% endfor %}
+      </ul>
+{% endif %}
+<h1>Showing Entries of Center of ID: {{id}} Name: {{name}}</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Mobile No.</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Blood Group</th>
+            <th>City</th>
+            <th>Booked Time</th>
+        </tr>
+    </thead>
+    {% for row in rows %}
+    <tbody>
+        <tr>
+            <td>{{ row.userno.name }}</td>
+            <td>{{row.userno.mobileno}}</td>
+            <td>{{row.userno.age}}</td>
+            <td> {{row.userno.gender}} </td>
+            <td>{{row.userno.bloodgroup}}</td>
+            <td>{{row.userno.city}} - {{row.userno.pincode}}</td>
+            <td>{{row.entrydatetime}}</td>
+        </tr>
+    </tbody>
+    {% endfor %}
+</table>
+
+{% endblock content %}

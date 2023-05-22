@@ -29,23 +29,25 @@ def generate_cookie_value(user_id):
 def adminhome(request):
     cookie = request.COOKIES.get('admincookie')
     if cookie:
-        userno = admindetails.objects.get(cookiekey=cookie)
-        if request.method == 'POST':
-            query = request.POST.get('search')
-            rows = 0
-            rows = {'rows':rows}
-            return render(request, 'Admin/adminhome.html', rows)
+        user = admindetails.objects.get(cookiekey=cookie)
+        context = {'name':user.username, 'rows':centersdb.objects.all()}
+        if request.GET.get('search'):
+            query = request.GET.get('search')
+            rows = centersdb.objects.filter(id=query)
+            context['rows'] = rows
+            messages.info(request, 'Your search results for "'+query+'"')
+            
+        if request.GET.get('id'):
+            id = request.GET.get('id')
+            messages.info(request, "showing the entries of center ID:"+id)
+            return HttpResponseRedirect('entriesof?id='+id)
         
-        if request.GET.get('book'):
-            id = request.GET.get('book')
-            name = centersdb.objects.get(id=id)
-            c = entries.objects.create(
-                centerid=name,
-                userno = userno
-            )
-            c.save()
-            messages.info(request, "You successfully booked for vaccination at"+name.name+'  ID:'+id)
-        return render(request, 'Admin/adminhome.html', {"name":userno.username})
+        if request.method == 'POST':
+            id = request.POST.get('remove')
+            c = centersdb.objects.get(id=id)
+            c.delete()
+            messages.info(request, "Deleted Center Successfully of ID:"+id)
+        return render(request, 'Admin/adminhome.html', context)
     return render(request, 'Admin/adminsignin.html')
     
 
@@ -82,32 +84,45 @@ def adminlogout(request):
     return response
 
 def adminadd(request):
-    if request.GET.get('name'):
-        name = request.GET.get('name')
-        mobileno = request.GET.get('mobileno')
-        line1 = request.GET.get('line1')
-        line2 = request.GET.get('line2')
-        city = request.GET.get('city')
-        pincode = request.GET.get('pincode')
-        whfrom = request.GET.get('whfrom')
-        whto = request.GET.get('whto')
-        #return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
-        
-        try:
-            c = centersdb.objects.create(
-                name=name,
-                mobileno=mobileno,
-                line1 = line1,
-                line2 = line2,
-                city = city,
-                pincode = pincode,
-                whfrom = whfrom,
-                whto = whto
-                )
-            c.save()
-            messages.info(request, 'Successfully created')
-        except Exception as e:
-            messages.error(request, 'Sorry Unexpected Error Happened, Please Retry')
-        return redirect('adminhome')
-    return render(request, 'Admin/adminadd.html')
+    cookie = request.COOKIES.get('admincookie')
+    if cookie:
+        if request.GET.get('name'):
+            name = request.GET.get('name')
+            mobileno = request.GET.get('mobileno')
+            line1 = request.GET.get('line1')
+            line2 = request.GET.get('line2')
+            city = request.GET.get('city')
+            pincode = request.GET.get('pincode')
+            whfrom = request.GET.get('whfrom')
+            whto = request.GET.get('whto')
+            #return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
+            
+            try:
+                c = centersdb.objects.create(
+                    name=name,
+                    mobileno=mobileno,
+                    line1 = line1,
+                    line2 = line2,
+                    city = city,
+                    pincode = pincode,
+                    whfrom = whfrom,
+                    whto = whto
+                    )
+                c.save()
+                messages.info(request, 'Successfully created')
+            except Exception as e:
+                messages.error(request, 'Sorry Unexpected Error Happened, Please Retry')
+            return redirect('adminhome')
+        return render(request, 'Admin/adminadd.html')
+    return render(request, 'Admin/adminsignin.html')
     
+def entriesof(request):
+    cookie = request.COOKIES.get('admincookie')
+    if cookie:
+        if request.GET.get('id'):
+            id = request.GET.get('id')
+            idname = centersdb.objects.get(id=id) 
+            rows = entries.objects.filter(centerid=id).order_by('-entrydatetime')
+            context = {'id':idname.id, 'name':idname.name, 'rows':rows}
+        return render(request, 'Admin/entriesof.html', context)
+    return render(request, 'Admin/adminsignin.html')

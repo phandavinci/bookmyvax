@@ -3,8 +3,8 @@ from django.db import models
 # Create your models here.
 
 class UserSignIn(models.Model):
-    name = models.CharField(max_length=100, primary_key=True)
-    mobileno = models.CharField(max_length=10)
+    name = models.CharField(max_length=100)
+    mobileno = models.CharField(max_length=10, primary_key=True)
     password = models.CharField(max_length=46)
     cookiekey = models.CharField(max_length=45, default='0')
     age = models.CharField(max_length=2)
