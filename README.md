@@ -103,7 +103,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd your/to/the/project/DevRev
+  cd your/path/to/project/DevRev
 ```
 
 Start the server in terminal or commandline
