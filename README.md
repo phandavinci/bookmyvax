@@ -97,13 +97,13 @@ To environmentally install pip environment
 Clone the project
 
 ```bash
-  git clone https://github.com/phandavinci/DevRev
+  git clone https://github.com/phandavinci/devrev.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd your/path/to/project/DevRev
+  cd your/path/to/project/devrev-main
 ```
 
 Start the server in terminal or commandline
