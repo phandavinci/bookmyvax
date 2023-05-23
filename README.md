@@ -114,6 +114,18 @@ Start the server in terminal or commandline
 
 Link for homepage:http://127.0.0.1:8000/usersignin
 
+## Testing Accounts
+
+### - For user
+
+- Mobileno: 9555595555
+- Password: test
+
+### - For Admin
+
+- Username: admin 
+- Password: admin
+
 ## Acknowledgements
 
  - Django
@@ -124,3 +136,4 @@ Link for homepage:http://127.0.0.1:8000/usersignin
 ## Database Structure
 
 ![DatabaseStructureImage](readmefiles/models.png)
+

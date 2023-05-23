@@ -1,0 +1,11 @@
+<h1>Admin Signup</h1>
+<form method="POST">
+    {% csrf_token %}
+    Username:<input type="text" name='username' maxlength='50' required><br>
+    Mobile no:<input type="text" name='mobileno' maxlength='10' required><br>
+    Password:<input type="password" name='password' maxlength='50' required><br>
+    age:<input type="text" name='age' maxlength='50' required><br>
+    gender:<input type="text" name='gender' maxlength='1' required><br>
+    <input type="submit">
+    <input type="reset">
+</form>

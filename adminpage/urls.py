@@ -6,5 +6,6 @@ urlpatterns = [
     path('adminsignin/', views.adminsignin, name='adminsignin'),
     path('adminlogout', views.adminlogout, name='adminlogout'),
     path('adminadd', views.adminadd, name='adminadd'),
-    path('entriesof', views.entriesof, name='entiresof')
+    path('entriesof', views.entriesof, name='entiresof'),
+    path('adminsignup', views.adminsignup, name='adminsignup')
 ]

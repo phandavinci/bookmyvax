@@ -8,6 +8,7 @@ django = "*"
 django-debug-toolbar = "*"
 django-extensions = "*"
 pydot = "*"
+pytz = "*"
 
 [dev-packages]
 

@@ -34,6 +34,7 @@ def userhome(request):
         if request.method == 'POST':
             query = request.POST.get('search')
             rows = matchingrows(query)
+            # return HttpResponse(rows)
             context['rows']=rows
             if query!='':
                 messages.info(request, 'Your search results for "'+query+'"')

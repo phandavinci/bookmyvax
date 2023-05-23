@@ -75,6 +75,29 @@ def adminsignin(request):
             
     return render(request, 'Admin/adminsignin.html')
 
+def adminsignup(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        mobileno = request.POST.get('mobileno')
+        password = request.POST.get('password')
+        age = request.POST.get('age')
+        gender = request.POST.get('gender')
+        try:
+            c = admindetails.objects.create(
+                username=username,
+                mobileno=mobileno,
+                password = hash_password(password),
+                age = age,
+                gender = gender,
+                )
+            c.save()
+            messages.info(request, 'Successfully created')
+        except:
+            messages.error(request, 'Admin already exist please login')
+        return redirect('adminsignin')
+    return render(request, 'Admin/adminsignup.html')
+
+
 def adminlogout(request):
     response = HttpResponseRedirect('adminsignin')
     try:
