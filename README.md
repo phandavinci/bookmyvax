@@ -23,6 +23,8 @@ To environmentally install pip environment
 
 ```bash
   pipenv install django
+  pipenv install django-extensions
+  pipenv install pytz
 ```
 
 ## Folder Structure
