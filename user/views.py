@@ -24,7 +24,8 @@ def generate_cookie_value(user_id):
     cookie_value = encoded_value.decode()
     return cookie_value
 
-
+def index(request):
+    return render(request, 'index.html')
 
 def userhome(request):
     cookie = request.COOKIES.get('usercookie')
