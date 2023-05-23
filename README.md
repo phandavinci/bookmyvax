@@ -112,7 +112,7 @@ Start the server in terminal or commandline
   python manage.py runserver
 ```
 
-Link for homepage:http://127.0.0.1:8000/
+Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
 
 ## Testing Accounts
 
