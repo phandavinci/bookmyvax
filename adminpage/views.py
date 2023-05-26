@@ -37,7 +37,6 @@ def adminhome(request):
             
         if request.GET.get('id'):
             id = request.GET.get('id')
-            messages.info(request, "showing the entries of center ID:"+id)
             return HttpResponseRedirect('entriesof?id='+id)
         
         if request.method == 'POST':

@@ -6,6 +6,8 @@ from centers.models import entries, centersdb
 from centers.views import matchingrows, mybookingsfilter
 import base64
 import hashlib
+from datetime import date
+from django.db.models import Q
 
 def index(request):
     return render(request, 'index.html')
@@ -34,16 +36,16 @@ def userhome(request):
     if get_cookie(request):
         userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
         context = {'name':userno.name}
-        if request.method == 'POST':
-            query = request.POST.get('search')
+        if request.GET.get('search'):
+            query = request.GET.get('search')
             rows = matchingrows(query)
             # return HttpResponse(rows)
             context['rows']=rows
             if query!='':
                 messages.info(request, 'Your search results for "'+query+'"')
         
-        if request.GET.get('book'):
-            id = request.GET.get('book')
+        if request.method == 'POST':
+            id = request.POST.get('book')
             name = centersdb.objects.get(id=id)
             c = entries.objects.create(
                 centerid=name,
@@ -51,6 +53,7 @@ def userhome(request):
             )
             c.save()
             messages.info(request, "You successfully booked for vaccination at '"+name.name+"'"+'  ID:'+id)
+            return render(request, 'base/userhome.html', context)
         return render(request, 'base/userhome.html', context)
     return render(request, 'base/usersignin.html')
     

@@ -1,8 +1,21 @@
-<a href="{% url 'adminhome' %}" style='color:black'>
-    <h1>Home</h1>
-</a>
+<div class="navbar">
+    <div class="home">
+        <a href="{% url 'adminhome' %}" style='color:black'>
+            <h1>Home</h1>
+        </a>
+    </div>
 
+    <div class="addacenter">
+        <a href="{% url 'adminadd' %}">
+            <h3>Add a Centre</h3>
+        </a>
+    </div>
 
-<a href="{% url 'adminlogout' %}" style='position: absolute; right:0; top:0'>
-    <h3>Logout</h3>
-</a>
+    <div class="logout">
+        <a href="{% url 'adminlogout' %}">
+            <h4>Logout</h4>
+        </a>
+    </div>
+</div>
+
+<hr>

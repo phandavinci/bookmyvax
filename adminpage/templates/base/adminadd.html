@@ -1,25 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-    <div class="center">
+{% extends 'base/adminmain.html' %}
+
+{% block content %}
+    <div class="form-signin">
+        <h1>Add a Center</h1>
         <form method='GET'>
-            Name:<input name='name' type="text" maxlength='50'required/><br>
-            Mobile Number:<input name='mobileno' type="text" maxlength='10'required/><br>
-            AddressLine1:<input name='line1' type="text" maxlength='50'required/><br>
-            AddressLine2:<input name='line2' type="text" maxlength='50'required/><br>
-            City:<input name='city' maxlength='50'required/><br>
-            pincode:<input name='pincode' maxlength='6'required/><br>
-            Working Hours:<br>From<input name='whfrom' type="text" maxlength='7'required/><br>To<input name='whto' type="text" maxlength='7'required/><br>
-            <input type="submit" value="Add">
-            <input type="reset">
+            Name:<input name='name' type="text" maxlength='50' class="form-control" required/><br>
+            Mobile Number:<input name='mobileno' type="text" maxlength='10' class="form-control" required/><br>
+            AddressLine1:<input name='line1' type="text" maxlength='50' class="form-control" required/><br>
+            AddressLine2:<input name='line2' type="text" maxlength='50' class="form-control" required/><br>
+            City:<input name='city' maxlength='50' class="form-control" required/><br>
+            pincode:<input name='pincode' maxlength='6' class="form-control" required/><br>
+            Working Hours:<br>From<input name='whfrom' type="text" maxlength='8' class="form-control" required/>To<input name='whto' type="text" maxlength='8' class="form-control" required/><br>
+            <br>
+            <input type="submit" value="Add" class="w-100 btn btn-lg btn-success">
+            <input type="reset" class="w-100 btn btn-lg btn-danger">
         </form>
     </div>
-</body>
-</html>
+{% endblock content %}

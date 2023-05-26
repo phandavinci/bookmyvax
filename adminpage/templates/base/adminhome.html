@@ -4,16 +4,15 @@
 
 {% block content %}
 
-<div class="name">
+<div class="name center">
     <h2>Hello {{name}}</h2>
 </div>
 
 
-
-<div class="searchbar">
+<div class="searchbar center">
     <form method='GET'>
         <input class="bar" type="text" placeholder="  search for center's id" name="search">
-        <button type="submit">Search</button> 
+        <button class="searchicon" type="submit"><i class="fa fa-search fa-lg"  aria-hidden="true"></i></button> 
     </form>
 </div>
 
@@ -25,11 +24,9 @@
       </ul>
 {% endif %}
 
-<div class="center">
-    <a href="{% url 'adminadd' %}">
-        <button>Add a Center</button>
-    </a>
-</div>
+<h2>Centers</h2>
+
+
 <table>
     <thead>
         <tr>
@@ -39,6 +36,7 @@
             <th>City</th>
             <th>Mobile</th>
             <th>Working Hours</th>
+            <th>Func</th>
         </tr>
     </thead>
     {% for row in rows %}

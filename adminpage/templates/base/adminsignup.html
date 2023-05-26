@@ -1,11 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoginUser</title>
+  <link rel="stylesheet" href="{% static 'stylesheet/adminstyle.css' %}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="form-signin">
 <h1>Admin Signup</h1>
 <form method="POST">
     {% csrf_token %}
-    Username:<input type="text" name='username' maxlength='50' required><br>
-    Mobile no:<input type="text" name='mobileno' maxlength='10' required><br>
-    Password:<input type="password" name='password' maxlength='50' required><br>
-    age:<input type="text" name='age' maxlength='50' required><br>
-    gender:<input type="text" name='gender' maxlength='1' required><br>
-    <input type="submit">
-    <input type="reset">
+    Username:<input type="text" name='username' maxlength='50' class="form-control" required><br>
+    Mobile no:<input type="text" name='mobileno' maxlength='10' class="form-control" required><br>
+    Password:<input type="password" name='password' maxlength='50' class="form-control" required><br>
+    age:<input type="text" name='age' maxlength='50' class="form-control" required><br>
+    gender:<input type="text" name='gender' maxlength='1' class="form-control" required><br>
+    <input type="submit" class="w-100 btn btn-lg btn-success">
+    <input type="reset" class="w-100 btn btn-lg btn-danger">
+    <br>
+    Already SignedUp, then <a href="{% url 'adminsignin' %}">signin</a>
 </form>
+</div>
+</body>
+</html>

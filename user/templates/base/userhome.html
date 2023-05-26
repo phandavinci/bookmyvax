@@ -12,8 +12,7 @@
 
 
 <div class="searchbar center">
-    <form method='POST'>
-        {% csrf_token %}
+    <form method='GET'>
         <input class="bar" type="text" placeholder="  search for center's id, mobileno, address, city or pincode" name="search">
         <button class="searchicon" type="submit"><i class="fa fa-search fa-lg"  aria-hidden="true"></i></button> 
     </form>
@@ -30,24 +29,6 @@
 <h2>Centers</h2>
 
 <div>
-    {% comment %} {% for row in rows %}
-        <br>
-        <form method='GET'>
-            {% csrf_token %}
-            <div name="id">ID: {{row.id}}</div>
-            <div name='name'>Name: {{row.name}}</div>
-            <div >Address: <br> {{row.line1}}, {{row.line2}}, {{row.city}}, {{row.pincode}} </div>
-            <div > {{row.mobileno}} </div>
-            <div >{{row.whfrom}} to {{row.whto}}</div>
-            <div class="vacancy">Vacancy: {{row.count}}</div> 
-            {% if row.count > 0 %}
-                <button name="book" value={{row.id}} type='submit'>Book</button>
-            {% else %}
-            <button disabled>Full</button>
-            {% endif %} 
-        </form>    
-        <br>
-    {% endfor %} {% endcomment %}
     <table>
         <thead>
             <tr>
@@ -72,11 +53,14 @@
                 <td>{{row.whfrom}} to {{row.whto}}</td>
                 <td>{{row.count}}</td>
                 <td>
-                    {% if row.count > 0 %}
-                        <button name="book" value={{row.id}} type='submit'>Book</button>
-                    {% else %}
-                        <button disabled>Full</button>
-                    {% endif %} 
+                    <form method='POST'>
+                        {% csrf_token %}
+                        {% if row.count > 0 %}
+                            <button name="book" value={{row.id}} type='submit'>Book</button>
+                        {% else %}
+                            <button disabled>Full</button>
+                        {% endif %} 
+                    </form>
                 </td>
             </tr>
         </tbody>
