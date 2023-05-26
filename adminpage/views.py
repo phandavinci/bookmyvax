@@ -6,7 +6,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 import base64
 import hashlib
 
-
 def hash_password(password):
     secret_key = 'sidfht34985ty34q8h58934y54hsdfngshtgdsgfn45023'
     user_data = str(password)
@@ -14,7 +13,6 @@ def hash_password(password):
     encoded_value = base64.urlsafe_b64encode(hashlib.sha256(combined_data.encode()).digest())
     hashedpass = encoded_value.decode()
     return hashedpass
-
 
 def generate_cookie_value(user_id):
     secret_key = 'hsdaifuhf34ry52938y982h93h892htfhfdjnfasdufh98whr'
@@ -24,12 +22,12 @@ def generate_cookie_value(user_id):
     cookie_value = encoded_value.decode()
     return cookie_value
 
-
+def get_cookie(request):
+    return request.COOKIES.get('admincookie')
 
 def adminhome(request):
-    cookie = request.COOKIES.get('admincookie')
-    if cookie:
-        user = admindetails.objects.get(cookiekey=cookie)
+    if get_cookie(request):
+        user = admindetails.objects.get(cookiekey=get_cookie(request))
         context = {'name':user.username, 'rows':centersdb.objects.all()}
         if request.GET.get('search'):
             query = request.GET.get('search')
@@ -47,18 +45,17 @@ def adminhome(request):
             c = centersdb.objects.get(id=id)
             c.delete()
             messages.info(request, "Deleted Center Successfully of ID:"+id)
-        return render(request, 'Admin/adminhome.html', context)
-    return render(request, 'Admin/adminsignin.html')
+        return render(request, 'base/adminhome.html', context)
+    return render(request, 'base/adminsignin.html')
     
 
 def adminsignin(request):
-    cookie = request.COOKIES.get('admincookie')
-    if cookie:
+    if get_cookie(request):
         try:
-            user = admindetails.objects.get(cookiekey=cookie)
+            user = admindetails.objects.get(cookiekey=get_cookie(request))
             return redirect('adminhome')
         except:
-            return render(request, 'Admin/adminsignin.html')
+            return render(request, 'base/adminsignin.html')
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -73,7 +70,7 @@ def adminsignin(request):
         except:
             messages.error(request, "Username or password is incorrect")
             
-    return render(request, 'Admin/adminsignin.html')
+    return render(request, 'base/adminsignin.html')
 
 def adminsignup(request):
     if request.method == 'POST':
@@ -95,7 +92,7 @@ def adminsignup(request):
         except:
             messages.error(request, 'Admin already exist please login')
         return redirect('adminsignin')
-    return render(request, 'Admin/adminsignup.html')
+    return render(request, 'base/adminsignup.html')
 
 
 def adminlogout(request):
@@ -107,8 +104,8 @@ def adminlogout(request):
     return response
 
 def adminadd(request):
-    cookie = request.COOKIES.get('admincookie')
-    if cookie:
+    
+    if get_cookie(request):
         if request.GET.get('name'):
             name = request.GET.get('name')
             mobileno = request.GET.get('mobileno')
@@ -136,16 +133,15 @@ def adminadd(request):
             except Exception as e:
                 messages.error(request, 'Sorry Unexpected Error Happened, Please Retry')
             return redirect('adminhome')
-        return render(request, 'Admin/adminadd.html')
-    return render(request, 'Admin/adminsignin.html')
+        return render(request, 'base/adminadd.html')
+    return render(request, 'base/adminsignin.html')
     
 def entriesof(request):
-    cookie = request.COOKIES.get('admincookie')
-    if cookie:
+    if get_cookie(request):
         if request.GET.get('id'):
             id = request.GET.get('id')
             idname = centersdb.objects.get(id=id) 
             rows = entries.objects.filter(centerid=id).order_by('-entrydatetime')
             context = {'id':idname.id, 'name':idname.name, 'rows':rows}
-        return render(request, 'Admin/entriesof.html', context)
-    return render(request, 'Admin/adminsignin.html')
+        return render(request, 'base/entriesof.html', context)
+    return render(request, 'base/adminsignin.html')

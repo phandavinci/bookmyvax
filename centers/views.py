@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.db.models import Q
 from .models import centersdb, entries
+from user.models import UserSignIn
 from django.db.models import Count
 from datetime import date
 
 # Create your views here.
+
+today = date.today()
 def matchingrows(search_string):
     rows = centersdb.objects.filter(
         Q(id__icontains=search_string) |
@@ -15,7 +18,6 @@ def matchingrows(search_string):
         Q(pincode__icontains=search_string) 
     )
     res = []
-    today = date.today()
     for i in range(len(rows)):
         count = entries.objects.filter(Q(entrydatetime__date=today), centerid=rows[i].id)
         res.append(
@@ -35,5 +37,7 @@ def matchingrows(search_string):
         # rows[i]['count'] = count
     return res
     
-    
-    
+def mybookingsfilter(cookie):
+    rows = entries.objects.filter(Q(entrydatetime__date=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydatetime')
+    return rows
+

@@ -109,7 +109,7 @@ Go to the project directory
 Start the server in terminal or commandline
 
 ```bash
-  python manage.py runserver
+  pipenv python manage.py runserver
 ```
 
 Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
@@ -125,9 +125,11 @@ Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
 
 - Username: admin 
 - Password: admin
+### For Database(Admin page login: http://127.0.0.1:8000/admin)
+- Username: abishek
+- password: abi123abi
 
 ## Acknowledgements
-
  - Django
  - Python v3.10
  - SQLite3
@@ -137,3 +139,23 @@ Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
 
 ![DatabaseStructureImage](readmefiles/models.png)
 
+## Tests done 
+`For Users:`
+- Do they able to log in and register properly?
+- Does the name of the user show correctly on the homepage?
+- Do they able to search centres?
+- Do they able to book a centre?
+- Is vacancy showing?
+- Is Booked alert showing?
+- Does the vacancy limit of 10 bookings per day work?
+- Do they able to log out properly?
+
+`For Admin:`
+- Does admin login and register work fine?
+- Does the name of the admin show correctly on the homepage?
+- Does the admin able to see all the centres on the homepage?
+- Does admin search a particular centre using its I'd?
+- Does the admin able to remove a centre?
+- Does the admin able to view the whole list of entries by the user and their info, particularly for a centre?
+- Does the admin able to add centre?
+- Does the admin able to log out?

@@ -3,9 +3,12 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn
 from centers.models import entries, centersdb
-from centers.views import matchingrows
+from centers.views import matchingrows, mybookingsfilter
 import base64
 import hashlib
+
+def index(request):
+    return render(request, 'index.html')
 
 def hash_password(password):
     secret_key = 'sidfht34985ty34q8h58934y54hsdfngshtgdsgfn45023'
@@ -24,13 +27,12 @@ def generate_cookie_value(user_id):
     cookie_value = encoded_value.decode()
     return cookie_value
 
-def index(request):
-    return render(request, 'index.html')
+def get_cookie(request):
+    return request.COOKIES.get('usercookie')
 
 def userhome(request):
-    cookie = request.COOKIES.get('usercookie')
-    if cookie:
-        userno = UserSignIn.objects.get(cookiekey=cookie)
+    if get_cookie(request):
+        userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
         context = {'name':userno.name}
         if request.method == 'POST':
             query = request.POST.get('search')
@@ -49,18 +51,17 @@ def userhome(request):
             )
             c.save()
             messages.info(request, "You successfully booked for vaccination at '"+name.name+"'"+'  ID:'+id)
-        return render(request, 'User/userhome.html', context)
-    return render(request, 'User/usersignin.html')
+        return render(request, 'base/userhome.html', context)
+    return render(request, 'base/usersignin.html')
     
 
 def usersignin(request):
-    cookie = request.COOKIES.get('usercookie')
-    if cookie:
+    if get_cookie(request):
         try:
-            user = UserSignIn.objects.get(cookiekey=cookie)
+            user = UserSignIn.objects.get(cookiekey=get_cookie(request))
             return redirect('userhome')
         except:
-            return render(request, 'User/usersignin.html')
+            return render(request, 'base/usersignin.html')
     if request.method == 'POST':
         mobileno = request.POST.get('mobileno')
         password = request.POST.get('password')
@@ -75,7 +76,7 @@ def usersignin(request):
         except:
             messages.error(request, "Username or password is incorrect")
             
-    return render(request, 'User/usersignin.html')
+    return render(request, 'base/usersignin.html')
 
 def userlogout(request):
     response = HttpResponseRedirect('usersignin')
@@ -117,15 +118,14 @@ def usersignup(request):
         except:
             messages.error(request, 'User already exist please login')
         return redirect('usersignin')
-    return render(request, 'User/usersignup.html')
+    return render(request, 'base/usersignup.html')
     
 def book(request):
-    if request.method == 'GET':
+    if request.method == 'GET' and get_cookie(request):
         id = request.GET.get('id')
         name = request.GET.get('name')
         try:
-            cookie = request.COOKIES.get('usercookie')
-            userno = UserSignIn.objects.get(cookie)
+            userno = UserSignIn.objects.get(get_cookie(request))
         except:
             return redirect(usersignin)
         c = entries.objects.create(
@@ -135,3 +135,16 @@ def book(request):
         c.save()
         messages.info("You successfully booked for vaccination at"+name+'ID:'+id)
         return redirect(userhome)
+    
+def mybookings(request):
+    if get_cookie(request):
+        cookiekey = get_cookie(request)
+        context = {'rows':mybookingsfilter(cookiekey)}
+    return render(request, 'base/mybookings.html', context)
+
+def allbookings(request):
+    if get_cookie(request):
+        cookiekey = get_cookie(request)
+        rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookiekey).mobileno).order_by('-entrydatetime')
+        context = {'rows':rows }
+    return render(request, 'base/allbookings.html', context)

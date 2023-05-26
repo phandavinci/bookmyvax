@@ -1,0 +1,38 @@
+{% extends 'base/usermain.html' %} 
+{% block content %}
+<h1>This is the section where you can view your bookings</h1>
+<h2>Note!!! The bookings below are only the bookings which are booked by you today</h2>
+<h3>If you want to view your all bookings since your signup, visit here -> <a href="{% url 'allbookings' %}">ALLBOOKINGS</a></h3>
+
+<br>
+<h1>Booked Centres</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Entry ID</th>
+            <th>Centre ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Mobile</th>
+            <th>Working Hours</th>
+            <th>Booked Time</th>
+        </tr>
+    </thead>
+    {% for row in rows %}
+    <tbody>
+        <tr>
+            <td>{{ row.id }}</td>
+            <td>{{row.centerid.id}}</td>
+            <td>{{row.centerid.name}}</td>
+            <td>{{row.centerid.line1}}, {{row.centerid.line2}}</td>
+            <td>{{row.centerid.city}} - {{row.centerid.pincode}}</td>
+            <td> {{row.centerid.mobileno}} </td>
+            <td>{{row.centerid.whfrom}} to {{row.centerid.whto}}</td>
+            <td>{{row.entrydatetime}}</td>
+        </tr>
+    </tbody>
+    {% endfor %}
+</table>
+
+{% endblock content %}

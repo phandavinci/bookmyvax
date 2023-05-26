@@ -1,6 +1,4 @@
 from django.db import models
-import pytz
-from django.utils import timezone
 
 # Create your models here.
 
@@ -18,11 +16,6 @@ class UserSignIn(models.Model):
     city = models.CharField(max_length=50)
     pincode = models.CharField(max_length=6)
     created = models.DateTimeField(auto_now_add=True, verbose_name='EntryDateTime')
-    def save(self, *args, **kwargs):
-        tz = pytz.timezone('Asia/Kolkata')  # Set the desired timezone
-        current_datetime = timezone.now().astimezone(tz)
-        self.created = current_datetime
-        super().save(*args, **kwargs)
     def __str__(self) -> str:
         return self.name
     

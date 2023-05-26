@@ -1,0 +1,14 @@
+body{
+    background-color: aliceblue;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust the height as needed */
+  }
+  
+  .container button {
+    margin: 10px;
+  }
