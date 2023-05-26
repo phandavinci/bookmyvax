@@ -149,6 +149,8 @@ Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
 - Is Booked alert showing?
 - Does the vacancy limit of 10 bookings per day work?
 - Do they able to log out properly?
+- Do they able to view the bookings of the user at that particular date?
+- Do they able to view the all bookings since signup? 
 
 `For Admin:`
 - Does admin login and register work fine?
