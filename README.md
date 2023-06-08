@@ -126,6 +126,7 @@ Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
 
 - Username: admin 
 - Password: admin
+- secretcode: devrev (for signup)
 ### For Database(Admin page login: http://127.0.0.1:8000/admin)
 - Username: abishek
 - password: abi123abi

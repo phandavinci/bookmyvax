@@ -79,18 +79,23 @@ def adminsignup(request):
         password = request.POST.get('password')
         age = request.POST.get('age')
         gender = request.POST.get('gender')
-        try:
-            c = admindetails.objects.create(
-                username=username,
-                mobileno=mobileno,
-                password = hash_password(password),
-                age = age,
-                gender = gender,
-                )
-            c.save()
-            messages.info(request, 'Successfully created')
-        except:
-            messages.error(request, 'Admin already exist please login')
+        secretcode = request.POST.get('secretcode')
+        if secretcode == "devrev":
+            try:
+                c = admindetails.objects.create(
+                    username=username,
+                    mobileno=mobileno,
+                    password = hash_password(password),
+                    age = age,
+                    gender = gender
+                    )
+                c.save()
+                messages.info(request, 'Successfully created')
+            except:
+                messages.error(request, 'Admin already exist please login')
+        else:
+            messages.error(request, 'secretcode not valid')
+            return render(request, 'base/adminsignup.html')
         return redirect('adminsignin')
     return render(request, 'base/adminsignup.html')
 
