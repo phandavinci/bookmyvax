@@ -22,7 +22,7 @@ For Environmental installation of packages
 To environmentally install pip environment 
 
 ```bash
-  pipenv install django pytz
+  pipenv install django pytz django-extensions tzdata
 ```
 
 ## Folder Structure
