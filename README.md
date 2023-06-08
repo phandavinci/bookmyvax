@@ -109,7 +109,8 @@ Go to the project directory
 Start the server in terminal or commandline
 
 ```bash
-  pipenv python manage.py runserver
+  pipenv shell
+  python manage.py runserver
 ```
 
 Link for homepage:http://127.0.0.1:8000/ or http://localhost:8000
