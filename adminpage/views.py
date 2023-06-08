@@ -44,6 +44,7 @@ def adminhome(request):
             c = centersdb.objects.get(id=id)
             c.delete()
             messages.info(request, "Deleted Center Successfully of ID:"+id)
+            return redirect(adminhome)
         return render(request, 'base/adminhome.html', context)
     return render(request, 'base/adminsignin.html')
     

@@ -35,7 +35,8 @@ def get_cookie(request):
 def userhome(request):
     if get_cookie(request):
         userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
-        context = {'name':userno.name}
+        rows = matchingrows('')
+        context = {'name':userno.name, 'rows':rows}
         if request.GET.get('search'):
             query = request.GET.get('search')
             rows = matchingrows(query)
@@ -53,7 +54,7 @@ def userhome(request):
             )
             c.save()
             messages.info(request, "You successfully booked for vaccination at '"+name.name+"'"+'  ID:'+id)
-            return render(request, 'base/userhome.html', context)
+            return redirect(userhome)
         return render(request, 'base/userhome.html', context)
     return render(request, 'base/usersignin.html')
     
@@ -122,22 +123,7 @@ def usersignup(request):
             messages.error(request, 'User already exist please login')
         return redirect('usersignin')
     return render(request, 'base/usersignup.html')
-    
-def book(request):
-    if request.method == 'GET' and get_cookie(request):
-        id = request.GET.get('id')
-        name = request.GET.get('name')
-        try:
-            userno = UserSignIn.objects.get(get_cookie(request))
-        except:
-            return redirect(usersignin)
-        c = entries.objects.create(
-            centerid=id,
-            userno = userno.mobileno
-        )
-        c.save()
-        messages.info("You successfully booked for vaccination at"+name+'ID:'+id)
-        return redirect(userhome)
+
     
 def mybookings(request):
     if get_cookie(request):

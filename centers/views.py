@@ -10,6 +10,7 @@ from datetime import date
 today = date.today()
 def matchingrows(search_string):
     rows = centersdb.objects.filter(
+        Q(name__icontains=search_string) |
         Q(id__icontains=search_string) |
         Q(mobileno__icontains=search_string) |
         Q(line1__icontains=search_string) |
