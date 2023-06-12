@@ -40,6 +40,7 @@
                 <th>City</th>
                 <th>Mobile</th>
                 <th>Working Hours</th>
+                <th>Dosage</th>
                 <th>Book</th>
             </tr>
         </thead>
@@ -52,13 +53,14 @@
                 <td>{{row.city}} - {{row.pincode}}</td>
                 <td> {{row.mobileno}} </td>
                 <td>{{row.whfrom}} to {{row.whto}}</td>
+                <td>{{row.dosage}}</td>
                 <td>
-                    {% if row.count > 0 %}
+                    {% if row.dosage > 0 %}
                         <a href='book/{{row.id}}'>
                             <button>Book</button>
                         </a>
                     {% else %}
-                        <button disabled>Full</button>
+                        <button disabled>No Vaccine</button>
                     {% endif %} 
                 </td>
             </tr>

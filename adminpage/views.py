@@ -93,17 +93,13 @@ def adminadd(request):
             line2 = request.GET.get('line2')
             city = request.GET.get('city')
             pincode = request.GET.get('pincode')
+            dosage = request.GET.get('dosage')
+            vacancy = request.GET.get('vacancy')
+            slots = request.GET.get('slots')
             whfrom = request.GET.get('whfrom')
             whto = request.GET.get('whto')
-            wt = datetime.strptime(whto, '%H:%M').time()
-            wf = datetime.strptime(whfrom, '%H:%M').time()
-            t = datetime.combine(datetime.today(), wt)
-            f = datetime.combine(datetime.today(), wf)
-            total = abs((t - f)/3)
-            slot1 = (f+total).time()
-            slot2 = (f+(2*total)).time()
             
-            #return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
+            # return HttpResponse([name, mobileno, line1, line2, city, pincode, dosage, vacancy, slots, whfrom, whto])
             
             try:
                 c = centersdb.objects.create(
@@ -113,15 +109,16 @@ def adminadd(request):
                     line2 = line2,
                     city = city,
                     pincode = pincode,
+                    dosage = dosage,
+                    vacancy = vacancy,
+                    slots = slots,
                     whfrom = whfrom,
-                    whto = whto, 
-                    slot1 = slot1,
-                    slot2 = slot2
+                    whto = whto,
                     )
                 c.save()
                 messages.info(request, 'Successfully created')
             except Exception as e:
-                messages.error(request, 'Sorry Unexpected Error Happened, Please Retry')
+                messages.error(request, e)
             return redirect('adminhome')
         return render(request, 'base/adminadd.html')
     return render(request, 'base/adminsignin.html')

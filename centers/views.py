@@ -3,7 +3,7 @@ from django.db.models import Q
 from .models import centersdb, entries
 from user.models import UserSignIn
 from django.db.models import Count
-from datetime import date
+from datetime import date, datetime, timedelta
 
 # Create your views here.
 
@@ -18,39 +18,50 @@ def matchingrows(search_string):
         Q(city__icontains=search_string) |
         Q(pincode__icontains=search_string) 
     )
-    res = []
-    for i in range(len(rows)):
-        count = entries.objects.filter(Q(entrydate=today), centerid=rows[i].id)
-        res.append(
-                {'id':rows[i].id,
-                'name':rows[i].name,
-                'mobileno':rows[i].mobileno,
-                'line1':rows[i].line1,
-                'line2':rows[i].line2,
-                'city':rows[i].city,
-                'pincode':rows[i].pincode,
-                'whfrom':rows[i].whfrom,
-                'whto':rows[i].whto,
-                'count': 10-count.count()}
-                )
-        # return [today, count[i].entrydatetime.date()]
-        # count = entries.objects.filter(entrydatetime__date=today, centerid=rows[i].id)
-        # rows[i]['count'] = count
-    return res
+    return rows
+    
+def slot(row):
+        slotss = row.centerid.slots
+        whfrom = datetime.combine(datetime.today(), row.centerid.whfrom)
+        whto = datetime.combine(datetime.today(), row.centerid.whto)
+        total = abs((whfrom - whto)/slotss)
+        fr = row.slot*total+datetime.combine(datetime.today(),row.centerid.whfrom)
+        to = fr+total if fr+total<whto else whto
+        res = {'f':fr.time(), 't':to.time()}
+        return res
     
 def mybookingsfilter(cookie):
     rows = entries.objects.filter(Q(entrydate=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    for row in rows:
+        row.slot = slot(row)
     return rows
 
 def futurebookingfilter(cookie):
     rows = entries.objects.filter(Q(entrydate__gt=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    for row in rows:
+        row.slot = slot(row)
     return rows
 
-def slots(id):
-    res = {}
-    for i in range(2):
-        rows = entries.objects.filter(Q(entrydate=today), centerid=id, slot=i)
-        res[i] = 3-rows.count()
-    rows = entries.objects.filter(Q(entrydate=today), centerid=id, slot=i)
-    res[2] = 4-rows.count()
+def allbookingfilter(cookie):
+    rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    for row in rows:
+        row.slot = slot(row)
+    return rows
+
+def slots(id, d):
+    row = centersdb.objects.get(id=id)
+    vacancy = row.vacancy
+    slotss = row.slots
+    whfrom = datetime.combine(datetime.today(), row.whfrom)
+    whto = datetime.combine(datetime.today(), row.whto)
+    total = abs((whfrom - whto)/slotss)
+    a = vacancy // slotss
+    result = [a] * slotss
+    result[:vacancy % slotss] = [count + 1 for count in result[:vacancy % slotss]]
+    res = []; s = whfrom - total; e = whfrom
+    for i, n in enumerate(result):
+        s += total
+        e = s+total if s+total<whto else whto
+        n-= entries.objects.filter(centerid=id, slot=i, entrydate=d).count()
+        res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
     return res

@@ -2,6 +2,16 @@
 {% block content %}
 <br>
 <h1>Booked Centres</h1>
+
+<h2>Filter</h2>
+<form  method='GET'>
+    <select class="form-select" name='filter' aria-label="Default select example">
+        <option value='1' selected>Today's upcoming Bookings</option>
+        <option value="2">Future Bookings</option>
+        <option value="3">All Bookings since signup</option>
+    </select>
+    <button type="submit">Apply Filter</button>
+</form>
 <table>
     <thead>
         <tr>
@@ -27,15 +37,7 @@
             <td> {{row.centerid.mobileno}} </td>
             <td>{{row.centerid.whfrom}} to {{row.centerid.whto}}</td>
             <td>{{row.entrydate}}</td>
-            {% if row.slot == 0 %}
-            <td>{{row.slot}}: {{row.centerid.whfrom}} - {{row.centerid.slot1}}</td>
-            {% endif %}
-            {% if row.slot == 1 %}
-            <td>{{row.slot}}: {{row.centerid.slot1}} - {{row.centerid.slot2}}</td>
-            {% endif %}
-            {% if row.slot == 2 %}
-            <td>{{row.slot}}: {{row.centerid.slot2}} - {{row.centerid.whto}}</td>
-            {% endif %}
+            <td>{{row.slot.f}} - {{row.slot.t}}</td>
 
         </tr>
     </tbody>

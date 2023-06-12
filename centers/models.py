@@ -11,10 +11,11 @@ class centersdb(models.Model):
     line2 = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
     pincode = models.CharField(max_length=6)
+    dosage = models.IntegerField()
+    vacancy = models.IntegerField()
+    slots = models.IntegerField()
     whfrom = models.TimeField()
     whto = models.TimeField()
-    slot1 = models.TimeField(default=datetime.now)
-    slot2 = models.TimeField(default=datetime.now)
     created = models.DateField(auto_now_add=True, verbose_name='EntryDate')
     def __str__(self):
         return str(self.id)

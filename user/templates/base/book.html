@@ -23,28 +23,28 @@
                 <th>Confirm</th>
             </tr>
         </thead>
-        {% for i in details %}
+        {% for detail in details %}
         <tbody>
             <tr>
-                <td>{{ i.0 }}</td>
-                <td>{{ i.1 }}</td>
+                <td>{{ detail.date }}</td>
+                <td>{{ detail.vacancy }}</td>
                 <form method='GET'>
                     <td>
                         <select id='slot' name='slot'>
-                            {% if i.2.0%}
-                            <option value='{{0}}'>{{row.whfrom}} - {{row.slot1}}</option>
-                            {% endif %}
-                            {% if i.2.2%}
-                            <option value='{{1}}'>{{row.slot1}} - {{row.slot2}}</option>
-                            {% endif %}
-                            {% if i.2.2%}
-                            <option value='{{2}}'>{{row.slot2}} - {{row.whto}}</option>
-                            {% endif %}
+                            {% for slots in detail.slots %}
+                                {% if slots.rem %}
+                                    <option value='{{slots.slot}}'>{{slots.startime}} - {{slots.endtime}}</option>
+                                {% endif %}
+                            {% endfor %}
                         </select required>
                     </td>
-                    <input type="hidden" name="date" value="{{i.0}}"/> 
+                    <input type="hidden" name="date" value="{{ detail.date }}"/> 
                     <td>
-                        <button name="date" value="{{i.0}}" type='submit'>Confirm</button>
+                        {% if detail.vacancy %}
+                            <button type='submit'>Confirm</button>
+                        {% else %}
+                            <button disabled>Full</button>
+                        {% endif %}
                     </td>
                 </form>
             </tr>

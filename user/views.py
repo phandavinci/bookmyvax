@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn
 from centers.models import entries, centersdb
-from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter
+from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter
 import base64
 import hashlib
 from datetime import datetime, time, date, timedelta
@@ -33,39 +33,51 @@ def get_cookie(request):
     return request.COOKIES.get('usercookie')
 
 def book(request, id):
-    try:
-        rows = centersdb.objects.get(id=id)
-    except:
-        return HttpResponse("The ID doesn't exist")
-    details = []
-    for i in range(7):
-        d = date.today() + timedelta(days=i)
-        v = 10-entries.objects.filter(entrydate=d, centerid=id).count()
-        s = slots(id)
-        if v>0:
-            details.append([d, v, s])
-    context = {'row':rows, 'details':details}
-    userid = UserSignIn.objects.get(cookiekey=get_cookie(request))
-    if request.GET.get('slot'):
-        slot = request.GET.get('slot')
-        datee = datetime.strptime(request.GET.get('date'), "%B %d, %Y").strftime("%Y-%m-%d")
-        c = entries.objects.create(
-            userno = userid,
-            centerid = rows,
-            slot = slot,
-            entrydate = datee
-        )
-        c.save()
-        messages.success(request, "Booked the centre "+rows.name+" with ID "+str(rows.id)+" at "+datee+" of slot "+str(slot)+" successfully.")
-        return redirect(userhome)
-    return render(request,'base/book.html', context)
+    if get_cookie(request):
+        try:
+            row = centersdb.objects.get(id=id)
+        except:
+            return HttpResponse("The ID doesn't exist")
+        
+        if row.dosage < 1:
+            messages.error(request, "There is no vaccine for the selected centre")
+            return redirect(userhome)
+        
+        details = []
+        for i in range(7):
+            d = date.today() + timedelta(days=i)
+            v = row.vacancy-entries.objects.filter(centerid=id, entrydate=d).count() if row.dosage>=row.vacancy else row.dosage
+            s = slots(id, d)
+            if v>0:
+                details.append({'date':d, 'vacancy':v, 'slots':s})
+        # return HttpResponse(slots(id))
+        context = {'row':row, 'vacancy':row.dosage-entries.objects.filter(centerid=id).count(), 'details':details}
+        userid = UserSignIn.objects.get(cookiekey=get_cookie(request))
+        
+        if request.GET.get('slot'):
+            slot = request.GET.get('slot')
+            datee = datetime.strptime(request.GET.get('date'), "%B %d, %Y").strftime("%Y-%m-%d")
+            c = entries.objects.create(
+                userno = userid,
+                centerid = row,
+                slot = slot,
+                entrydate = datee
+            )
+            c.save()
+            row.dosage-=1
+            row.save()
+            messages.success(request, "Booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(slot)+" successfully.")
+        # else:
+        #     messages.error(request, 'the slot is unavailable')
+            return redirect(userhome)
+        return render(request,'base/book.html', context)
+    return render(request, usersignin)
 
 def userhome(request):
     if get_cookie(request):
         userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
-        rows = matchingrows('')
+        rows = centersdb.objects.all()
         context = {'name':userno.name, 'rows':rows}
-        
         if request.GET.get('search'):
             query = request.GET.get('search')
             rows = matchingrows(query)
@@ -146,22 +158,21 @@ def usersignup(request):
     return render(request, 'base/usersignup.html')
 
     
-def todaybookings(request):
+def bookings(request):
     if get_cookie(request):
         cookiekey = get_cookie(request)
         context = {'rows':mybookingsfilter(cookiekey)}
-    return render(request, 'base/todaybookings.html', context)
-
-def futurebookings(request):
-    if get_cookie(request):
-        cookiekey = get_cookie(request)
-        context = {'rows':futurebookingfilter(cookiekey)}
-    return render(request, 'base/futurebookings.html', context)
-
-def allbookings(request):
-    if get_cookie(request):
-        cookiekey = get_cookie(request)
-        rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookiekey).mobileno).order_by('-entrydate')
-        context = {'rows':rows }
-    return render(request, 'base/allbookings.html', context)
+        if request.GET.get('filter'):
+            filter = request.GET.get('filter')
+            if filter=='1':
+                context = {'rows':mybookingsfilter(cookiekey)}
+            if filter=='2':
+                context = {'rows':futurebookingfilter(cookiekey)}
+            if filter=="3":
+                context = {'rows':allbookingfilter(cookiekey)}
+            return render(request, 'base/bookings.html', context)
+        return render(request, 'base/bookings.html', context)
+    else:
+        return redirect(usersignin)
+    
 
