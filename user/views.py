@@ -33,14 +33,22 @@ def get_cookie(request):
     return request.COOKIES.get('usercookie')
 
 def book(request, id):
-    rows = centersdb.objects.get(id=id)
-    mini = date.today().strftime("%Y-%m-%d")
-    maxi = (date.today() + timedelta(days=30)).strftime("%Y-%m-%d")
-    context = {'row':rows, 'mini':mini, 'maxi':maxi, 'slots':slots(id)}
+    try:
+        rows = centersdb.objects.get(id=id)
+    except:
+        return HttpResponse("The ID doesn't exist")
+    details = []
+    for i in range(7):
+        d = date.today() + timedelta(days=i)
+        v = 10-entries.objects.filter(entrydate=d, centerid=id).count()
+        s = slots(id)
+        if v>0:
+            details.append([d, v, s])
+    context = {'row':rows, 'details':details}
     userid = UserSignIn.objects.get(cookiekey=get_cookie(request))
     if request.GET.get('slot'):
         slot = request.GET.get('slot')
-        datee = request.GET.get('date')
+        datee = datetime.strptime(request.GET.get('date'), "%B %d, %Y").strftime("%Y-%m-%d")
         c = entries.objects.create(
             userno = userid,
             centerid = rows,
@@ -105,28 +113,30 @@ def usersignup(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         mobileno = request.POST.get('mobileno')
+        email = request.POST.get('email')
         password = request.POST.get('password')
         age = request.POST.get('age')
         gender = request.POST.get('gender')
         bloodgroup = request.POST.get('bloodgroup')
-        doorno = request.POST.get('doorno')
-        line1 = request.POST.get('line1')
-        line2 = request.POST.get('line2')
-        city = request.POST.get('city')
-        pincode = request.POST.get('pincode')
+        # doorno = request.POST.get('doorno')
+        # line1 = request.POST.get('line1')
+        # line2 = request.POST.get('line2')
+        # city = request.POST.get('city')
+        # pincode = request.POST.get('pincode')
         try:
             c = UserSignIn.objects.create(
                 name=name,
                 mobileno=mobileno,
+                email = email,
                 password = hash_password(password),
                 age = age,
                 gender = gender,
                 bloodgroup = bloodgroup,
-                doorno = doorno,
-                line1 = line1,
-                line2 = line2,
-                city = city,
-                pincode = pincode
+                # doorno = doorno,
+                # line1 = line1,
+                # line2 = line2,
+                # city = city,
+                # pincode = pincode
                 )
             c.save()
             messages.info(request, 'Successfully created')

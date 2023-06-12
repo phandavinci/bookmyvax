@@ -28,6 +28,8 @@
 
 <h2>Centres</h2>
 
+<h3>You can book for the slots from today upto 1 week</h3>
+
 <div>
     <table>
         <thead>
@@ -38,8 +40,7 @@
                 <th>City</th>
                 <th>Mobile</th>
                 <th>Working Hours</th>
-                <th>Vacancy</th>
-                <th>Book/Full</th>
+                <th>Book</th>
             </tr>
         </thead>
         {% for row in rows %}
@@ -51,7 +52,6 @@
                 <td>{{row.city}} - {{row.pincode}}</td>
                 <td> {{row.mobileno}} </td>
                 <td>{{row.whfrom}} to {{row.whto}}</td>
-                <td>{{row.count}}</td>
                 <td>
                     {% if row.count > 0 %}
                         <a href='book/{{row.id}}'>
