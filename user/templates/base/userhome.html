@@ -53,14 +53,13 @@
                 <td>{{row.whfrom}} to {{row.whto}}</td>
                 <td>{{row.count}}</td>
                 <td>
-                    <form method='POST'>
-                        {% csrf_token %}
-                        {% if row.count > 0 %}
-                            <button name="book" value={{row.id}} type='submit'>Book</button>
-                        {% else %}
-                            <button disabled>Full</button>
-                        {% endif %} 
-                    </form>
+                    {% if row.count > 0 %}
+                        <a href='book/{{row.id}}'>
+                            <button>Book</button>
+                        </a>
+                    {% else %}
+                        <button disabled>Full</button>
+                    {% endif %} 
                 </td>
             </tr>
         </tbody>

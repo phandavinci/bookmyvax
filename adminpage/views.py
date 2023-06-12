@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import admindetails
 from centers.models import centersdb, entries
+
+from datetime import datetime, time, date, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 import base64
 import hashlib
@@ -72,33 +74,6 @@ def adminsignin(request):
             
     return render(request, 'base/adminsignin.html')
 
-def adminsignup(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        mobileno = request.POST.get('mobileno')
-        password = request.POST.get('password')
-        age = request.POST.get('age')
-        gender = request.POST.get('gender')
-        secretcode = request.POST.get('secretcode')
-        if secretcode == "devrev":
-            try:
-                c = admindetails.objects.create(
-                    username=username,
-                    mobileno=mobileno,
-                    password = hash_password(password),
-                    age = age,
-                    gender = gender
-                    )
-                c.save()
-                messages.info(request, 'Successfully created')
-            except:
-                messages.error(request, 'Admin already exist please login')
-        else:
-            messages.error(request, 'secretcode not valid')
-            return render(request, 'base/adminsignup.html')
-        return redirect('adminsignin')
-    return render(request, 'base/adminsignup.html')
-
 
 def adminlogout(request):
     response = HttpResponseRedirect('adminsignin')
@@ -120,6 +95,14 @@ def adminadd(request):
             pincode = request.GET.get('pincode')
             whfrom = request.GET.get('whfrom')
             whto = request.GET.get('whto')
+            wt = datetime.strptime(whto, '%H:%M').time()
+            wf = datetime.strptime(whfrom, '%H:%M').time()
+            t = datetime.combine(datetime.today(), wt)
+            f = datetime.combine(datetime.today(), wf)
+            total = abs((t - f)/3)
+            slot1 = (f+total).time()
+            slot2 = (f+(2*total)).time()
+            
             #return HttpResponse([name, mobileno, line1, line2, city, pincode, whfrom, whto])
             
             try:
@@ -131,7 +114,9 @@ def adminadd(request):
                     city = city,
                     pincode = pincode,
                     whfrom = whfrom,
-                    whto = whto
+                    whto = whto, 
+                    slot1 = slot1,
+                    slot2 = slot2
                     )
                 c.save()
                 messages.info(request, 'Successfully created')
@@ -146,7 +131,7 @@ def entriesof(request):
         if request.GET.get('id'):
             id = request.GET.get('id')
             idname = centersdb.objects.get(id=id) 
-            rows = entries.objects.filter(centerid=id).order_by('-entrydatetime')
+            rows = entries.objects.filter(centerid=id).order_by('entrydate')
             context = {'id':idname.id, 'name':idname.name, 'rows':rows}
         return render(request, 'base/entriesof.html', context)
     return render(request, 'base/adminsignin.html')

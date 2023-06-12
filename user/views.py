@@ -3,10 +3,10 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn
 from centers.models import entries, centersdb
-from centers.views import matchingrows, mybookingsfilter
+from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter
 import base64
 import hashlib
-from datetime import date
+from datetime import datetime, time, date, timedelta
 from django.db.models import Q
 
 def index(request):
@@ -32,11 +32,32 @@ def generate_cookie_value(user_id):
 def get_cookie(request):
     return request.COOKIES.get('usercookie')
 
+def book(request, id):
+    rows = centersdb.objects.get(id=id)
+    mini = date.today().strftime("%Y-%m-%d")
+    maxi = (date.today() + timedelta(days=30)).strftime("%Y-%m-%d")
+    context = {'row':rows, 'mini':mini, 'maxi':maxi, 'slots':slots(id)}
+    userid = UserSignIn.objects.get(cookiekey=get_cookie(request))
+    if request.GET.get('slot'):
+        slot = request.GET.get('slot')
+        datee = request.GET.get('date')
+        c = entries.objects.create(
+            userno = userid,
+            centerid = rows,
+            slot = slot,
+            entrydate = datee
+        )
+        c.save()
+        messages.success(request, "Booked the centre "+rows.name+" with ID "+str(rows.id)+" at "+datee+" of slot "+str(slot)+" successfully.")
+        return redirect(userhome)
+    return render(request,'base/book.html', context)
+
 def userhome(request):
     if get_cookie(request):
         userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
         rows = matchingrows('')
         context = {'name':userno.name, 'rows':rows}
+        
         if request.GET.get('search'):
             query = request.GET.get('search')
             rows = matchingrows(query)
@@ -44,17 +65,7 @@ def userhome(request):
             context['rows']=rows
             if query!='':
                 messages.info(request, 'Your search results for "'+query+'"')
-        
-        if request.method == 'POST':
-            id = request.POST.get('book')
-            name = centersdb.objects.get(id=id)
-            c = entries.objects.create(
-                centerid=name,
-                userno = userno
-            )
-            c.save()
-            messages.info(request, "You successfully booked for vaccination at '"+name.name+"'"+'  ID:'+id)
-            return redirect(userhome)
+            
         return render(request, 'base/userhome.html', context)
     return render(request, 'base/usersignin.html')
     
@@ -125,15 +136,22 @@ def usersignup(request):
     return render(request, 'base/usersignup.html')
 
     
-def mybookings(request):
+def todaybookings(request):
     if get_cookie(request):
         cookiekey = get_cookie(request)
         context = {'rows':mybookingsfilter(cookiekey)}
-    return render(request, 'base/mybookings.html', context)
+    return render(request, 'base/todaybookings.html', context)
+
+def futurebookings(request):
+    if get_cookie(request):
+        cookiekey = get_cookie(request)
+        context = {'rows':futurebookingfilter(cookiekey)}
+    return render(request, 'base/futurebookings.html', context)
 
 def allbookings(request):
     if get_cookie(request):
         cookiekey = get_cookie(request)
-        rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookiekey).mobileno).order_by('-entrydatetime')
+        rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookiekey).mobileno).order_by('-entrydate')
         context = {'rows':rows }
     return render(request, 'base/allbookings.html', context)
+

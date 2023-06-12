@@ -20,7 +20,7 @@ def matchingrows(search_string):
     )
     res = []
     for i in range(len(rows)):
-        count = entries.objects.filter(Q(entrydatetime__date=today), centerid=rows[i].id)
+        count = entries.objects.filter(Q(entrydate=today), centerid=rows[i].id)
         res.append(
                 {'id':rows[i].id,
                 'name':rows[i].name,
@@ -39,6 +39,18 @@ def matchingrows(search_string):
     return res
     
 def mybookingsfilter(cookie):
-    rows = entries.objects.filter(Q(entrydatetime__date=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydatetime')
+    rows = entries.objects.filter(Q(entrydate=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
     return rows
 
+def futurebookingfilter(cookie):
+    rows = entries.objects.filter(Q(entrydate__gt=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    return rows
+
+def slots(id):
+    res = {}
+    for i in range(2):
+        rows = entries.objects.filter(Q(entrydate=today), centerid=id, slot=i)
+        res[i] = 3-rows.count()
+    rows = entries.objects.filter(Q(entrydate=today), centerid=id, slot=i)
+    res[2] = 4-rows.count()
+    return res

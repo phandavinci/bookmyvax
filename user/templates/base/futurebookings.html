@@ -1,26 +1,19 @@
-{% extends 'base/adminmain.html' %}
+{% extends 'base/usermain.html' %}
 
 
 
 {% block content %}
-
-{% if messages%}
-      <ul class='messages'></ul>
-        {% for message in messages%}
-          <li>{{message}}</li>
-          {% endfor %}
-      </ul>
-{% endif %}
-<h1>Showing Entries of Centre of ID: {{id}} Name: {{name}}</h1>
+<h1>Your Future Bookings</h1>
 <table>
     <thead>
         <tr>
+            <th>Entry ID</th>
+            <th>Centre ID</th>
             <th>Name</th>
-            <th>Mobile No.</th>
-            <th>Age</th>
-            <th>Gender</th>
-            <th>Blood Group</th>
+            <th>Address</th>
             <th>City</th>
+            <th>Mobile</th>
+            <th>Working Hours</th>
             <th>Date</th>
             <th>Slot</th>
         </tr>
@@ -28,12 +21,13 @@
     {% for row in rows %}
     <tbody>
         <tr>
-            <td>{{ row.userno.name }}</td>
-            <td>{{row.userno.mobileno}}</td>
-            <td>{{row.userno.age}}</td>
-            <td> {{row.userno.gender}} </td>
-            <td>{{row.userno.bloodgroup}}</td>
-            <td>{{row.userno.city}} - {{row.userno.pincode}}</td>
+            <td>{{ row.id }}</td>
+            <td>{{row.centerid.id}}</td>
+            <td>{{row.centerid.name}}</td>
+            <td>{{row.centerid.line1}}, {{row.centerid.line2}}</td>
+            <td>{{row.centerid.city}} - {{row.centerid.pincode}}</td>
+            <td> {{row.centerid.mobileno}} </td>
+            <td>{{row.centerid.whfrom}} to {{row.centerid.whto}}</td>
             <td>{{row.entrydate}}</td>
             {% if row.slot == 0 %}
             <td>{{row.slot}}: {{row.centerid.whfrom}} - {{row.centerid.slot1}}</td>
@@ -44,6 +38,7 @@
             {% if row.slot == 2 %}
             <td>{{row.slot}}: {{row.centerid.slot2}} - {{row.centerid.whto}}</td>
             {% endif %}
+
         </tr>
     </tbody>
     {% endfor %}

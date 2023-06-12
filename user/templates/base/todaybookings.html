@@ -1,9 +1,11 @@
-{% extends 'base/usermain.html' %}
-
-
-
+{% extends 'base/usermain.html' %} 
 {% block content %}
-<h1>All Bookings since signup</h1>
+<h1>This is the section where you can view your bookings</h1>
+<h2>Note!!! The bookings below are only the bookings which are booked by you today</h2>
+<h3>If you want to view your all bookings since your signup, visit here -> <a href="{% url 'allbookings' %}">ALLBOOKINGS</a></h3>
+
+<br>
+<h1>Booked Centres</h1>
 <table>
     <thead>
         <tr>
