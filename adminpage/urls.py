@@ -7,4 +7,5 @@ urlpatterns = [
     path('adminlogout', views.adminlogout, name='adminlogout'),
     path('adminadd', views.adminadd, name='adminadd'),
     path('entriesof', views.entriesof, name='entiresof'),
+    path('modify/<str:id>', views.modify, name="modify")
 ]

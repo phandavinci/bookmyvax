@@ -1,18 +1,36 @@
 {% extends 'base/usermain.html' %} 
 {% block content %}
 <br>
-<h1>Booked Centres</h1>
 
-<h2>Filter</h2>
-<form  method='GET'>
-    <select class="form-select" name='filter' aria-label="Default select example">
-        <option value='1' selected>Today's upcoming Bookings</option>
-        <option value="2">Future Bookings</option>
-        <option value="3">All Bookings since signup</option>
-    </select>
-    <button type="submit">Apply Filter</button>
-</form>
-<table>
+
+{% if messages%}
+      <ul class='messages'></ul>
+        {% for message in messages%}
+          <li>{{message}}</li>
+          {% endfor %}
+      </ul>
+{% endif %}
+
+<div class="text-center">
+    <h3>Booked Vaccinations</h3>
+    <h5>You can cancel any upcoming vaccination before the time of  booked slot on a particular date</h5>
+
+    
+    <form method='GET'>
+        <div class="col-sm-3 d-flex align-items-baseline">
+            <select class="form-select form-select-lg mb-3" name='filter'>
+                <option value="1" {% if filter == "1" %} selected {% endif %} >Today's Bookings</option>
+                <option value="2" {% if filter == "2" %} selected {% endif %} >Future Bookings</option>
+                <option value="3" {% if filter == "3" %} selected {% endif %} >All Bookings since signup</option>
+            </select>
+            <div class="col-sm-4"><button class='btn btn-primary' type="submit">Apply Filter</button></div>
+        </div>
+    </form>
+    
+
+
+<br>
+<table class='table'>
     <thead>
         <tr>
             <th>Entry ID</th>
@@ -24,6 +42,7 @@
             <th>Working Hours</th>
             <th>Date</th>
             <th>Slot</th>
+            <th>Cancel</th>
         </tr>
     </thead>
     {% for row in rows %}
@@ -38,10 +57,18 @@
             <td>{{row.centerid.whfrom}} to {{row.centerid.whto}}</td>
             <td>{{row.entrydate}}</td>
             <td>{{row.slot.f}} - {{row.slot.t}}</td>
-
+            <td>
+            <form method="get">
+                <input type="hidden" name="id" value="{{ row.id }}">
+                {% if row.slot.cancel %}
+                    <button class="btn btn-link">Cancel</button>
+                {% else %}
+                    <button class='btn btn-link' disabled>Expired</button>
+                {% endif %}
+            </form>
         </tr>
     </tbody>
     {% endfor %}
 </table>
-
+</div>
 {% endblock content %}

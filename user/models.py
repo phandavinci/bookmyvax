@@ -20,3 +20,9 @@ class UserSignIn(models.Model):
     def __str__(self) -> str:
         return self.name
     
+class message(models.Model):
+    users = models.ForeignKey(UserSignIn, on_delete=models.CASCADE)
+    sub = models.TextField(null=True)
+    message = models.TextField(null=True)
+    is_read = models.BooleanField(default=False)
+    entrydate = models.DateField(auto_now_add=True)

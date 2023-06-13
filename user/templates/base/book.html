@@ -11,16 +11,17 @@
 {% endif %}
 
 <h2>Showing the available slots and dates for the selected centre</h2>
+<div class="text-center">
 <h3>Name: {{row.name}} with ID: {{row.id}}</span></h3>
-
+</div>
 <div>
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 <th>Date</th>
                 <th>Vacancy</th>
                 <th>Slots</th>
-                <th>Confirm</th>
+                <th class='col-1'>Confirm</th>
             </tr>
         </thead>
         {% for detail in details %}
@@ -41,9 +42,9 @@
                     <input type="hidden" name="date" value="{{ detail.date }}"/> 
                     <td>
                         {% if detail.vacancy %}
-                            <button type='submit'>Confirm</button>
+                            <button class='btn btn-link' type='submit'>Confirm</button>
                         {% else %}
-                            <button disabled>Full</button>
+                            <button class='btn btn-link' disabled>Full</button>
                         {% endif %}
                     </td>
                 </form>
@@ -55,7 +56,7 @@
 <br>
 <div class="text-center">
     <a href='{% url 'userhome' %}'>
-        <button class="w-100 btn btn-lg btn-info">Back</button>
+        <button class="btn btn-lg btn-info">Back</button>
     </a>
 </div>
 </div>

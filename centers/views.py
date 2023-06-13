@@ -22,12 +22,13 @@ def matchingrows(search_string):
     
 def slot(row):
         slotss = row.centerid.slots
-        whfrom = datetime.combine(datetime.today(), row.centerid.whfrom)
-        whto = datetime.combine(datetime.today(), row.centerid.whto)
+        whfrom = datetime.combine(row.entrydate, row.centerid.whfrom)
+        whto = datetime.combine(row.entrydate, row.centerid.whto)
         total = abs((whfrom - whto)/slotss)
-        fr = row.slot*total+datetime.combine(datetime.today(),row.centerid.whfrom)
+        fr = row.slot*total+datetime.combine(row.entrydate,row.centerid.whfrom)
         to = fr+total if fr+total<whto else whto
-        res = {'f':fr.time(), 't':to.time()}
+        cancel = 1 if datetime.now() < fr+(total//2) else 0
+        res = {'f':fr.time(), 't':to.time(), 'cancel':cancel}
         return res
     
 def mybookingsfilter(cookie):
@@ -52,8 +53,8 @@ def slots(id, d):
     row = centersdb.objects.get(id=id)
     vacancy = row.vacancy
     slotss = row.slots
-    whfrom = datetime.combine(datetime.today(), row.whfrom)
-    whto = datetime.combine(datetime.today(), row.whto)
+    whfrom = datetime.combine(d, row.whfrom)
+    whto = datetime.combine(d, row.whto)
     total = abs((whfrom - whto)/slotss)
     a = vacancy // slotss
     result = [a] * slotss
@@ -63,5 +64,6 @@ def slots(id, d):
         s += total
         e = s+total if s+total<whto else whto
         n-= entries.objects.filter(centerid=id, slot=i, entrydate=d).count()
-        res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
+        if datetime.now()<=s+(total//4):
+            res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
     return res

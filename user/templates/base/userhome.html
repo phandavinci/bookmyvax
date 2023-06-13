@@ -4,20 +4,20 @@
 
 {% block content %}
 
+<div class="text-center">
 
-
-<div class="name center">
+<div class="name">
     <h2>Hello {{name}}</h2>
-</div>
 
 
-<div class="searchbar center">
+
+<div class="searchbar">
     <form method='GET'>
         <input class="bar" type="text" placeholder="  search for center's id, name, mobileno, address, city or pincode" name="search">
         <button class="searchicon" type="submit"><i class="fa fa-search fa-lg"  aria-hidden="true"></i></button> 
     </form>
 </div>
-
+</div>
 {% if messages%}
       <ul class='messages'></ul>
         {% for message in messages%}
@@ -28,10 +28,11 @@
 
 <h2>Centres</h2>
 
-<h3>You can book for the slots from today upto 1 week</h3>
-
+<div class='text-center'>
+<h6><b>INFO: </b>You can only book upto 4 vaccine for a particular center on a particular date.<br> You can book for the slots from today upto 1 week</b></h6>
+</div>
 <div>
-    <table>
+    <table class='table'>
         <thead>
             <tr>
                 <th>Centre ID</th>
@@ -57,10 +58,10 @@
                 <td>
                     {% if row.dosage > 0 %}
                         <a href='book/{{row.id}}'>
-                            <button>Book</button>
+                            <button class='btn btn-link'>Book</button>
                         </a>
                     {% else %}
-                        <button disabled>No Vaccine</button>
+                        <button class='btn btn-link' disabled>No Vaccine</button>
                     {% endif %} 
                 </td>
             </tr>
@@ -68,5 +69,5 @@
         {% endfor %}
     </table>
 </div>
-
+</div>
 {% endblock content %}

@@ -1,0 +1,32 @@
+{% extends 'base/adminmain.html' %}
+
+{% block content %}
+<div class="text-center">
+<h3>This page is for modifing the selected centre with ID {{row.id}} named {{row.name}}</h3>
+</div>
+<div class="form-signin">
+
+    <form method='GET'>
+        Name:<input name='name' type="text" maxlength='50' class="form-control"/><br>
+        Mobile Number:<input name='mobileno' type="text" maxlength='10' class="form-control"/><br>
+        AddressLine1:<input name='line1' type="text" maxlength='50' class="form-control" /><br>
+        AddressLine2:<input name='line2' type="text" maxlength='50' class="form-control"/><br>
+        City:<input name='city' maxlength='50' class="form-control" /><br>
+        pincode:<input name='pincode' maxlength='6' class="form-control" /><br>
+        Dosage: <input name='dosage' class='form-control' /><br>
+        <b>INFO:</b>The above field(dosage) is for adding extra dosage from what is available, not for modifing.
+        So, please specify the new stock count only.
+        Vacany: <input name='vacancy' class='form-control' /><br>
+        Slots: <input name='slots' class='form-control' /><br>
+        Working Hours:<br>From<input name='whfrom' type="time" maxlength='8' class="form-control"/>To<input name='whto' type="time" maxlength='8' class="form-control"/><br>
+        <br>
+        <div class="d-flex">
+        <input type="submit" value="Add" class="w-100 btn btn-lg btn-success">
+        <a href="{% url 'adminhome' %}">
+            <input type="button" value="Back" class="w-100 btn btn-lg btn-danger">
+        </a>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

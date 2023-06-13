@@ -1,0 +1,39 @@
+{% extends 'base/usermain.html' %}
+
+
+
+
+{% block content %}
+<div class="text-center">
+    {% if messages%}
+    <ul class='messages'></ul>
+      {% for message in messages%}
+        <li>{{message}}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<form method='get'>
+    <table class="table table">
+        <thead>
+            <tr class="d-flex">
+                <th class="col-2"><h3>Sub</h3></th>
+                <th class="col-9"><h3>Messages</h3></th>
+                <th class="col-1"><button class="btn btn-danger" type="submit">Delete</button></th>
+            </tr>
+        </thead>
+        {% for msg in msgs %}
+            <tbody>
+                <tr class="d-flex">
+                    <td class="col-2">{{msg.sub}}</td>
+                    <td class="col-9">{{msg.message}}</td>
+                    <td class="col-1"><input class="checkbox-style " type="checkbox" name="id" value="{{msg.id}}"><td>
+                </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+</form>
+<a href="{% url 'userhome' %}">
+    <button  class="btn btn-primary">Back</button>
+</a>
+</div>
+{% endblock content %}

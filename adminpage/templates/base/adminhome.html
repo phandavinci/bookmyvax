@@ -3,7 +3,7 @@
 
 
 {% block content %}
-
+<div class="text-center">
 <div class="name center">
     <h2>Hello {{name}}</h2>
 </div>
@@ -11,7 +11,7 @@
 
 <div class="searchbar center">
     <form method='GET'>
-        <input class="bar" type="text" placeholder="  search for center's id" name="search">
+        <input class="bar" type="text" placeholder="  search for centre's id" name="search">
         <button class="searchicon" type="submit"><i class="fa fa-search fa-lg"  aria-hidden="true"></i></button> 
     </form>
 </div>
@@ -24,19 +24,23 @@
       </ul>
 {% endif %}
 
+<br>
 <h2>Centres</h2>
+<br>
 
-
-<table>
+<table class='table'>
     <thead>
         <tr>
-            <th>ID</th>
+            <th>Centre ID</th>
             <th>Name</th>
             <th>Address</th>
             <th>City</th>
             <th>Mobile</th>
             <th>Working Hours</th>
-            <th>Func</th>
+            <th>Dosage</th>
+            <th>Vacancy/day</th>
+            <th>Slots/day</th>
+            <th>Remove / Modify</th>
         </tr>
     </thead>
     {% for row in rows %}
@@ -44,7 +48,7 @@
         <tr>
             <td>
                 <form method="GET">
-                    <button name='id' value={{row.id}}>{{ row.id }}</button>
+                    <button class='btn btn-link' name='id' value={{row.id}}>{{ row.id }}</button>
                 </form>
             </td>
             <td>{{row.name}}</td>
@@ -52,15 +56,23 @@
             <td>{{row.city}} - {{row.pincode}}</td>
             <td> {{row.mobileno}} </td>
             <td>{{row.whfrom}} to {{row.whto}}</td>
+            <td>{{row.dosage}}</td>
+            <td>{{row.vacancy}}</td>
+            <td>{{row.slots}}</td>      
             <td>
                 <form method="POST">
                     {% csrf_token %}
-                    <button type="submit" name='remove' value={{ row.id }}>Remove</button>
+                    <button type="submit" class="btn btn-link" name='remove' value={{ row.id }}>Remove</button> /
+                    <a href="modify/{{row.id}}">
+                        <input value='Modify' type='button' class="btn btn-link">
+                    </a>
                 </form>
             </td>
         </tr>
     </tbody>
     {% endfor %}
 </table>
+
+</div>
 
 {% endblock content %}
