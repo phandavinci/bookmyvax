@@ -40,6 +40,14 @@ def login_required(view_func):
             return redirect(adminsignin)
     return wrapper
 
+def sendemail(sub, body, recipient):
+    send_mail(
+        sub,
+        body,
+        "201501002@rajalaskhmi.edu.com",
+        [recipient]
+    )
+
 @login_required
 def adminhome(request):
     user = admindetails.objects.get(cookiekey=get_cookie(request))
@@ -62,9 +70,9 @@ def adminhome(request):
             for user in users:
                 row = UserSignIn.objects.get(mobileno=user['userno'])
                 sub = "Regarding the centre you have booked"
-                body = "Greetings "+row.name+",\n\tSorry for the inconvinience, the centre you have booked with ID: "+id+" with Name: "+c.name+" have removed. Please book other centre.\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+                body = "Greetings "+row.name+",\n\tSorry for the inconvinience, the centre you have booked with ID: "+id+" with Name: "+c.name+" removed. Please book other centre.\n\t\t\t\tThank You\nBest Regard,\nCVB Team"
                 recipient = row.email
-                send_mail(sub, body, '201501002@rajalakshmi.edu.in', recipient)
+                sendemail(sub, body, recipient)
                 a = message.objects.create(
                     users = row,
                     sub=sub,
@@ -162,6 +170,5 @@ def entriesof(request):
 def modify(request, id):
     row = centersdb.objects.get(id=id)
     context = {'row':row}
-    if request.GET.get('name'):
-        name = request.GET.get('name')
+    
     return render(request, 'base/modify.html', context)

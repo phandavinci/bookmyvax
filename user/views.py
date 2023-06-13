@@ -194,7 +194,7 @@ def book(request, id):
             c.save()
             row.dosage-=1
             row.save()
-            messages.success(request, "Booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(slot+1)+" successfully.")
+            messages.success(request, "Booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(slot)+" successfully.")
         else:
             messages.error(request, 'you have exceed the limit for the day '+ datee+ ' of centre '+ row.name + ' with id '+ str(row.id))
         return redirect(userhome)
