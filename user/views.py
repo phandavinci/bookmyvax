@@ -162,6 +162,10 @@ def book(request, id):
         row = centersdb.objects.get(id=id)
     except:
         return HttpResponse("The ID doesn't exist")
+    cookiekey = get_cookie(request)
+    userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
+    unread_count = message.objects.filter(users=userno, is_read=False).count()
+    context = {'rows':mybookingsfilter(cookiekey), 'unread_count':unread_count}
     
     if row.dosage < 1:
         messages.error(request, "There is no vaccine for the selected centre")
@@ -194,7 +198,7 @@ def book(request, id):
             c.save()
             row.dosage-=1
             row.save()
-            messages.success(request, "Booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(slot)+" successfully.")
+            messages.success(request, "Booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(int(slot)+1)+" successfully.")
         else:
             messages.error(request, 'you have exceed the limit for the day '+ datee+ ' of centre '+ row.name + ' with id '+ str(row.id))
         return redirect(userhome)
@@ -205,7 +209,7 @@ def msg(request):
     user = UserSignIn.objects.get(cookiekey=get_cookie(request))
     msgs = message.objects.filter(users=user)
     for m in msgs:
-        if m.entrydate > (datetime.today()+timedelta(days=6)).date():
+        if m.entrydatetime.date() < (datetime.today()-timedelta(days=6)).date():
             m.delete()
             continue
         m.is_read = True
@@ -217,7 +221,7 @@ def msg(request):
             temp.delete()
         messages.success(request, "Selected messages deleted successfully")
         return redirect(msg)
-    context = {'msgs':msgs.order_by('-entrydate')}
+    context = {'msgs':msgs.order_by('-entrydatetime')}
     return render(request, 'base/msg.html', context)
 
 @login_required

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import admindetails
+from centers.views import slot
 from centers.models import centersdb, entries
 from user.models import UserSignIn, message
 from functools import wraps
@@ -40,13 +41,28 @@ def login_required(view_func):
             return redirect(adminsignin)
     return wrapper
 
-def sendemail(sub, body, recipient):
-    send_mail(
-        sub,
-        body,
-        "201501002@rajalaskhmi.edu.com",
-        [recipient]
-    )
+def sendmessage(c, dele, name='', words=[]):
+    users = entries.objects.filter(centerid=c, entrydate__lte=date.today()).values('userno').distinct()
+    for user in users:
+        row = UserSignIn.objects.get(mobileno=user['userno'])
+        if dele:
+            sub = "Regarding the removal of centre that you booked"
+            body = "Greetings "+row.name+",\n\tSorry for the inconvinience, the centre you have booked with ID: "+str(c.id)+" with Name: "+c.name+" removed for some technical reasons. Please book other centre.\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+        else:
+            sub = "Regarding the changes in centre that you booked"
+            body = "Hey "+row.name+", \nDue to some technical reasons, the CVB Team has did some changes in the centre with ID: "+str(c.id)+" and Name: "+name+" that you have booked, \n\n"+''.join(words)+"\nAlso, You received a message and can check those information in the bookings section in our website.\n\t\t\t\tHappy Vaccinations\nBest Regards,\nCVB Team"
+        recipient = row.email
+        send_mail(
+            sub,
+            body,
+            "201501002@rajalaskhmi.edu.com",
+            [recipient]
+        )
+        a = message.objects.create(
+            users = row,
+            message=body
+        )
+        a.save()
 
 @login_required
 def adminhome(request):
@@ -66,19 +82,7 @@ def adminhome(request):
         if request.POST.get('remove'):
             id = request.POST.get('remove')
             c = centersdb.objects.get(id=id)
-            users = entries.objects.filter(centerid=c).values('userno').distinct()
-            for user in users:
-                row = UserSignIn.objects.get(mobileno=user['userno'])
-                sub = "Regarding the centre you have booked"
-                body = "Greetings "+row.name+",\n\tSorry for the inconvinience, the centre you have booked with ID: "+id+" with Name: "+c.name+" removed. Please book other centre.\n\t\t\t\tThank You\nBest Regard,\nCVB Team"
-                recipient = row.email
-                sendemail(sub, body, recipient)
-                a = message.objects.create(
-                    users = row,
-                    sub=sub,
-                    message=body
-                )
-                a.save()
+            sendmessage(c, 1)
             c.delete()
             messages.info(request, "Deleted Center Successfully of ID:"+id)     
             return redirect(adminhome)
@@ -166,9 +170,71 @@ def entriesof(request):
         context = {'id':idname.id, 'name':idname.name, 'rows':rows}
     return render(request, 'base/entriesof.html', context)
 
+def modifyfunc(sec,t, f, words):
+    words.append(sec+":\n"+"\t"+str(f)+" -> "+str(t)+"\n")
+    print(words)
+    return words
+
 @login_required
 def modify(request, id):
     row = centersdb.objects.get(id=id)
     context = {'row':row}
+    flag = 0
+    words = []
+    dosage = 0
+    name = row.name
+    if request.GET.get('name'):
+        words =  modifyfunc('Name', request.GET.get('name'), row.name, words)
+        row.name=request.GET.get('name')
+    if request.GET.get('mobileno'):
+        words =  modifyfunc('Mobile Number', request.GET.get('mobileno'), row.mobileno, words)
+        row.mobileno = request.GET.get('mobileno')
+    if request.GET.get('line1'):
+        words =  modifyfunc('Address Line1', request.GET.get('line1'), row.line1, words)
+        row.line1 = request.GET.get('line1')
+    if request.GET.get('line2'):
+        words =  modifyfunc('Address Line2', request.GET.get('line2'), row.line2, words)
+        row.line2 = request.GET.get('line2')
+    if request.GET.get('city'):
+        words =  modifyfunc('City', request.GET.get('city'), row.city, words)
+        row.city = request.GET.get('city')
+    if request.GET.get('pincode'):
+        words =  modifyfunc('Pincode', request.GET.get('pincode'), row.pincode, words)
+        row.pincode = request.GET.get('pincode')
+    if request.GET.get('dosage'):
+        dosage = int(request.GET.get('dosage'))
+        row.dosage+=dosage
+    if request.GET.get('vacancy'):
+        words =  modifyfunc('Vacancy', request.GET.get('vacancy'), row.vacancy, words)
+        row.vacancy = request.GET.get('vacancy')
+        flag = 1
+    if request.GET.get('slots'):
+        words =  modifyfunc('Slots', request.GET.get('slots'), row.slots, words)
+        row.slots = request.GET.get('slots')
+        flag = 1
+    if request.GET.get('whfrom'):
+        words =  modifyfunc('Woking Hours(from)', request.GET.get('whfrom'), row.whfrom, words)
+        row.whfrom = request.GET.get('whfrom')
+        flag = 1
+    if request.GET.get('whto'):
+        words =  modifyfunc('Working Hours(to)', request.GET.get('whto'), row.whto, words)
+        row.whto = request.GET.get('whto')
+        flag = 1
+        
+    
+    if flag:
+        words.append("\nDue to the change in slots, Your entries have deleted. Please select another slot for your convinience from the updated slots.\n ")
+        
+    if words or dosage:
+        if words:
+            sendmessage(row, 0, name, words)
+            if flag:
+                rows = entries.objects.filter(centerid=row)
+                cnt = rows.count()
+                row.dosage+=cnt
+                rows.delete()
+        row.save()
+        messages.info(request, "Modified Center Successfully of ID:"+id)     
+        return redirect(adminhome)
     
     return render(request, 'base/modify.html', context)
