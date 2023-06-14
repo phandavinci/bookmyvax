@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.db.models import Q
 from .models import centersdb, entries
 from user.models import UserSignIn
@@ -23,7 +24,7 @@ def matchingrows(search_string):
 def slot(row):
         slotss = row.centerid.slots
         whfrom = datetime.combine(row.entrydate, row.centerid.whfrom)
-        whto = datetime.combine(row.entrydate, row.centerid.whto)
+        whto =  datetime.combine(row.entrydate, row.centerid.whto)
         total = abs((whfrom - whto)/slotss)
         fr = row.slot*total+datetime.combine(row.entrydate,row.centerid.whfrom)
         to = fr+total if fr+total<whto else whto

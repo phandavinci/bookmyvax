@@ -4,6 +4,8 @@
 
 {% block content %}
 
+
+<div class="text-center">
 {% if messages%}
       <ul class='messages'></ul>
         {% for message in messages%}
@@ -11,42 +13,47 @@
           {% endfor %}
       </ul>
 {% endif %}
-<h1>Showing Entries of Centre of ID: {{id}} Name: {{name}}</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Mobile No.</th>
-            <th>Age</th>
-            <th>Gender</th>
-            <th>Blood Group</th>
-            <th>City</th>
-            <th>Date</th>
-            <th>Slot</th>
-        </tr>
-    </thead>
-    {% for row in rows %}
-    <tbody>
-        <tr>
-            <td>{{ row.userno.name }}</td>
-            <td>{{row.userno.mobileno}}</td>
-            <td>{{row.userno.age}}</td>
-            <td> {{row.userno.gender}} </td>
-            <td>{{row.userno.bloodgroup}}</td>
-            <td>{{row.userno.city}} - {{row.userno.pincode}}</td>
-            <td>{{row.entrydate}}</td>
-            {% if row.slot == 0 %}
-            <td>{{row.slot}}: {{row.centerid.whfrom}} - {{row.centerid.slot1}}</td>
-            {% endif %}
-            {% if row.slot == 1 %}
-            <td>{{row.slot}}: {{row.centerid.slot1}} - {{row.centerid.slot2}}</td>
-            {% endif %}
-            {% if row.slot == 2 %}
-            <td>{{row.slot}}: {{row.centerid.slot2}} - {{row.centerid.whto}}</td>
-            {% endif %}
-        </tr>
-    </tbody>
-    {% endfor %}
-</table>
+<h3>Showing Entries of Centre of ID: {{id}} Name: {{name}}</h3>
 
+
+
+<br>
+<table class='table'>
+<thead>
+    <tr>
+        <th>Name</th>
+        <th>Mobile No.</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Blood Group</th>
+        <th>Date</th>
+        <th>Slot</th>
+        <th>Cancel</th>
+    </tr>
+</thead>
+{% for row in rows %}
+<tbody>
+    <tr>
+        <td>{{ row.userno.name }}</td>
+        <td>{{row.userno.mobileno}}</td>
+        <td>{{row.userno.age}}</td>
+        <td>{{row.userno.gender}}</td>
+        <td>{{row.userno.bloodgroup}}</td>
+        <td> {{row.entrydate}} </td>
+        <td>{{row.slot.f}} - {{row.slot.t}}</td>
+        <td>
+        <form method="get">
+            <input type="hidden" name="id" value="{{ row.id }}">
+            {% if row.slot.cancel %}
+                <button class="btn btn-link">Cancel</button>
+            {% else %}
+                <button class='btn btn-link' disabled>Expired</button>
+            {% endif %}
+        </form>
+        </td>
+    </tr>
+</tbody>
+{% endfor %}
+</table>
+</div>
 {% endblock content %}

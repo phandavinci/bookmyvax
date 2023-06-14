@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn, message
 from centers.models import entries, centersdb
 from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter, slot
+from django.core.mail import send_mail
 import base64
 import hashlib
 from functools import wraps
@@ -45,10 +46,27 @@ def get_cookie(request):
     return request.COOKIES.get('usercookie')
 
 
+def sendmessage(c, sub, body):
+    a = message.objects.create(
+        users = c.userno,
+        message=body
+    )
+    a.save()
+    body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+    recipient = c.userno.email
+    send_mail(
+        sub,
+        body,
+        "201501002@rajalaskhmi.edu.com",
+        [recipient]
+    )
+
 @login_required
 def userhome(request):
     userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
     rows = centersdb.objects.all()
+    for row in rows:
+        row.dosage -= entries.objects.filter(Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
     unread_count = message.objects.filter(users=userno, is_read=False).count()
     context = {'name':userno.name, 'rows':rows, 'unread_count':unread_count}
     if request.GET.get('search'):
@@ -102,11 +120,6 @@ def usersignup(request):
         age = request.POST.get('age')
         gender = request.POST.get('gender')
         bloodgroup = request.POST.get('bloodgroup')
-        # doorno = request.POST.get('doorno')
-        # line1 = request.POST.get('line1')
-        # line2 = request.POST.get('line2')
-        # city = request.POST.get('city')
-        # pincode = request.POST.get('pincode')
         try:
             c = UserSignIn.objects.create(
                 name=name,
@@ -116,11 +129,6 @@ def usersignup(request):
                 age = age,
                 gender = gender,
                 bloodgroup = bloodgroup,
-                # doorno = doorno,
-                # line1 = line1,
-                # line2 = line2,
-                # city = city,
-                # pincode = pincode
                 )
             c.save()
             messages.info(request, 'Successfully created')
@@ -150,9 +158,10 @@ def bookings(request):
         id = request.GET.get('id')
         c = entries.objects.get(id=id)
         c.delete()
-        c.centerid.dosage+=1
-        c.centerid.save()
-        messages.info(request, "The booking with ID "+id+" is successfully cancelled")
+        sub = "Booked slot Cancelled"
+        body = "you have cancelled booking with ID "+id+" successfully."
+        sendmessage(c, sub, body)
+        messages.info(request, body)
         return redirect(bookings)
     return render(request, 'base/bookings.html', context)
     
@@ -162,11 +171,7 @@ def book(request, id):
         row = centersdb.objects.get(id=id)
     except:
         return HttpResponse("The ID doesn't exist")
-    cookiekey = get_cookie(request)
     userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
-    unread_count = message.objects.filter(users=userno, is_read=False).count()
-    context = {'rows':mybookingsfilter(cookiekey), 'unread_count':unread_count}
-    
     if row.dosage < 1:
         messages.error(request, "There is no vaccine for the selected centre")
         return redirect(userhome)
@@ -175,33 +180,37 @@ def book(request, id):
     for i in range(7):
         d = date.today() + timedelta(days=i)
         s = slots(id, d)    
-        # return HttpResponse(slots(id, d))
-        # print(slots(id, d),'\n')
         v = sum(d['rem'] for d in s) if row.dosage>=row.vacancy else row.dosage
+        rem = 4-entries.objects.filter(userno=userno, entrydate = d).count()
         if v>0:
-            details.append({'date':d, 'vacancy':v, 'slots':s})
-    #return HttpResponse(details[1])
+            details.append({'date':d, 'vacancy':v, 'slots':s, 'rem':rem})
     context = {'row':row, 'vacancy':row.dosage-entries.objects.filter(centerid=id).count(), 'details':details}
     userid = UserSignIn.objects.get(cookiekey=get_cookie(request))
     
     if request.GET.get('slot'):
-        slot = request.GET.get('slot')
+        slott = request.GET.get('slot')
         datee = datetime.strptime(request.GET.get('date'), "%B %d, %Y").strftime("%Y-%m-%d")
         entry = 4-entries.objects.filter(userno=userid, entrydate = datee).count()
         if entry:
             c = entries.objects.create(
                 userno = userid,
                 centerid = row,
-                slot = slot,
+                slot = slott,
                 entrydate = datee
             )
             c.save()
-            row.dosage-=1
-            row.save()
-            messages.success(request, "Booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(int(slot)+1)+" successfully.")
+            s = slot(entries.objects.get(id=c.id))
+            sub = "Slot booked successfully"
+            body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully."
+            sendmessage(entries.objects.get(id=c.id), sub, body)
+            messages.success(request, body)
         else:
             messages.error(request, 'you have exceed the limit for the day '+ datee+ ' of centre '+ row.name + ' with id '+ str(row.id))
         return redirect(userhome)
+    
+    
+    unread_count = message.objects.filter(users=userno, is_read=False).count()
+    context['unread_count'] = unread_count
     return render(request,'base/book.html', context)
 
 @login_required
@@ -226,4 +235,7 @@ def msg(request):
 
 @login_required
 def certificatespage(request):
-    return render(request, "base/certificatespage.html")
+    userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
+    unread_count = message.objects.filter(users=userno, is_read=False).count()
+    context = {'unread_count':unread_count}
+    return render(request, "base/certificatespage.html", context)

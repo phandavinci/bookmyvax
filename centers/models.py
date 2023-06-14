@@ -24,6 +24,7 @@ class entries(models.Model):
     centerid = models.ForeignKey(centersdb, on_delete=models.CASCADE)
     userno = models.ForeignKey(UserSignIn, on_delete=models.CASCADE)
     slot = models.IntegerField()
+    is_vaccinated = models.BooleanField(default=False)
     entrydate = models.DateField(default=date.today, verbose_name='EntryDate')
     def __str__(self):
         return str(self.userno)

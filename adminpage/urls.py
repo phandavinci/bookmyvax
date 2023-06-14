@@ -6,6 +6,7 @@ urlpatterns = [
     path('adminsignin/', views.adminsignin, name='adminsignin'),
     path('adminlogout', views.adminlogout, name='adminlogout'),
     path('adminadd', views.adminadd, name='adminadd'),
-    path('entriesof', views.entriesof, name='entiresof'),
-    path('modify/<str:id>', views.modify, name="modify")
+    path('entriesof/<str:id>', views.entriesof, name='entiresof'),
+    path('modify/<str:id>', views.modify, name="modify"),
+    path('confirmvaccination', views.confirmvaccination, name="confirmvaccination")
 ]

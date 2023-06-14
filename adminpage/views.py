@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import admindetails
-from centers.views import slot
+from centers.views import slot, mybookingsfilter, futurebookingfilter, allbookingfilter
 from centers.models import centersdb, entries
 from user.models import UserSignIn, message
 from functools import wraps
@@ -42,15 +42,21 @@ def login_required(view_func):
     return wrapper
 
 def sendmessage(c, dele, name='', words=[]):
-    users = entries.objects.filter(centerid=c, entrydate__lte=date.today()).values('userno').distinct()
+    users = entries.objects.filter(centerid=c, entrydate__gte=date.today()).values('userno').distinct()
     for user in users:
         row = UserSignIn.objects.get(mobileno=user['userno'])
         if dele:
             sub = "Regarding the removal of centre that you booked"
-            body = "Greetings "+row.name+",\n\tSorry for the inconvinience, the centre you have booked with ID: "+str(c.id)+" with Name: "+c.name+" removed for some technical reasons. Please book other centre.\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+            body = "Sorry for the inconvinience, the centre you have booked with ID: "+str(c.id)+" with Name: "+c.name+" removed for some technical reasons. Please book other centre."
         else:
             sub = "Regarding the changes in centre that you booked"
-            body = "Hey "+row.name+", \nDue to some technical reasons, the CVB Team has did some changes in the centre with ID: "+str(c.id)+" and Name: "+name+" that you have booked, \n\n"+''.join(words)+"\nAlso, You received a message and can check those information in the bookings section in our website.\n\t\t\t\tHappy Vaccinations\nBest Regards,\nCVB Team"
+            body = "Due to some technical reasons, the CVB Team has did some changes in the centre with ID: "+str(c.id)+" and Name: "+name+" that you have booked, \n\n"+''.join(words)+"\nAlso, You received a message and can check those information in the bookings section in our website."
+        a = message.objects.create(
+            users = row,
+            message=body
+        )
+        a.save()
+        body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
         recipient = row.email
         send_mail(
             sub,
@@ -58,11 +64,6 @@ def sendmessage(c, dele, name='', words=[]):
             "201501002@rajalaskhmi.edu.com",
             [recipient]
         )
-        a = message.objects.create(
-            users = row,
-            message=body
-        )
-        a.save()
 
 @login_required
 def adminhome(request):
@@ -161,18 +162,46 @@ def adminadd(request):
         return redirect('adminhome')
     return render(request, 'base/adminadd.html')
     
+def esendmessage(c, sub, body):
+    a = message.objects.create(
+    users = c.userno,
+    message=body
+    )
+    a.save()
+    body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+    recipient = c.userno.email
+    send_mail(
+        sub,
+        body,
+        "201501002@rajalaskhmi.edu.com",
+        [recipient]
+    )    
+
 @login_required    
-def entriesof(request):
+def entriesof(request, id):
+    def getslot(rows):
+        for row in rows:
+            row.slot = slot(row)
+        return rows
+    
+    idname = centersdb.objects.get(id=id) 
+    rows = entries.objects.filter(centerid=id).order_by('-entrydate')
+    context = {'id':idname.id, 'name':idname.name, 'rows':getslot(rows)}
+            
     if request.GET.get('id'):
-        id = request.GET.get('id')
-        idname = centersdb.objects.get(id=id) 
-        rows = entries.objects.filter(centerid=id).order_by('entrydate')
-        context = {'id':idname.id, 'name':idname.name, 'rows':rows}
+        ide = request.GET.get('id')
+        c = entries.objects.get(id=ide)
+        c.delete()
+        sub = "Booked slot Cancelled"
+        body = "The Admin have cancelled your booking with ID "+ide+" successfully."
+        esendmessage(c, sub, body)
+        messages.info(request, body)
+        return redirect(adminhome)
     return render(request, 'base/entriesof.html', context)
+
 
 def modifyfunc(sec,t, f, words):
     words.append(sec+":\n"+"\t"+str(f)+" -> "+str(t)+"\n")
-    print(words)
     return words
 
 @login_required
@@ -238,3 +267,8 @@ def modify(request, id):
         return redirect(adminhome)
     
     return render(request, 'base/modify.html', context)
+
+
+@login_required
+def confirmvaccination(request):
+    return render(request, 'base/confirmvaccination.html')

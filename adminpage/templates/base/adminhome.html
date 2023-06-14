@@ -4,9 +4,6 @@
 
 {% block content %}
 <div class="text-center">
-<div class="name center">
-    <h2>Hello {{name}}</h2>
-</div>
 
 
 <div class="searchbar center">
@@ -47,9 +44,7 @@
     <tbody>
         <tr>
             <td>
-                <form method="GET">
-                    <button class='btn btn-link' name='id' value={{row.id}}>{{ row.id }}</button>
-                </form>
+                <a href="entriesof/{{row.id}}"><button class='btn btn-link'>{{ row.id }}</button></a>
             </td>
             <td>{{row.name}}</td>
             <td>{{row.line1}}, {{row.line2}}</td>
