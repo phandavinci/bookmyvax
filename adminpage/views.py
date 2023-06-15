@@ -8,6 +8,7 @@ from functools import wraps
 from datetime import datetime, time, date, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.mail import send_mail
+from django.db.models import Q
 import base64
 import hashlib
 
@@ -41,7 +42,7 @@ def login_required(view_func):
             return redirect(adminsignin)
     return wrapper
 
-def sendmessage(c, dele, name='', words=[]):
+def sendmessage(request, c, dele, name='', words=[]):
     users = entries.objects.filter(centerid=c, entrydate__gte=date.today()).values('userno').distinct()
     for user in users:
         row = UserSignIn.objects.get(mobileno=user['userno'])
@@ -58,39 +59,16 @@ def sendmessage(c, dele, name='', words=[]):
         a.save()
         body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
         recipient = row.email
-        send_mail(
-            sub,
-            body,
-            "201501002@rajalaskhmi.edu.com",
-            [recipient]
-        )
+        try:
+            send_mail(
+                sub,
+                body,
+                "201501002@rajalaskhmi.edu.com",
+                [recipient]
+            )
+        except:
+            messages.error(request, "Can't able to send email")
 
-@login_required
-def adminhome(request):
-    user = admindetails.objects.get(cookiekey=get_cookie(request))
-    context = {'name':user.username, 'rows':centersdb.objects.all()}
-    if request.GET.get('search'):
-        query = request.GET.get('search')
-        rows = centersdb.objects.filter(id=query)
-        context['rows'] = rows
-        messages.info(request, 'Your search results for "'+query+'"')
-        
-    if request.GET.get('id'):
-        id = request.GET.get('id')
-        return HttpResponseRedirect('entriesof?id='+id)
-    
-    if request.method == 'POST':
-        if request.POST.get('remove'):
-            id = request.POST.get('remove')
-            c = centersdb.objects.get(id=id)
-            sendmessage(c, 1)
-            c.delete()
-            messages.info(request, "Deleted Center Successfully of ID:"+id)     
-            return redirect(adminhome)
-            
-            
-    return render(request, 'base/adminhome.html', context)
-    
 
 def adminsignin(request):
     if get_cookie(request):
@@ -102,7 +80,6 @@ def adminsignin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        # return HttpResponse(hash_password(password))
         try:
             user = admindetails.objects.get(username=username, password=hash_password(password))
             response = HttpResponseRedirect("/adminhome")
@@ -124,94 +101,100 @@ def adminlogout(request):
         return response
     return response
 
-@login_required
-def adminadd(request):
-    if request.GET.get('name'):
-        name = request.GET.get('name')
-        mobileno = request.GET.get('mobileno')
-        line1 = request.GET.get('line1')
-        line2 = request.GET.get('line2')
-        city = request.GET.get('city')
-        pincode = request.GET.get('pincode')
-        dosage = request.GET.get('dosage')
-        vacancy = request.GET.get('vacancy')
-        slots = request.GET.get('slots')
-        whfrom = request.GET.get('whfrom')
-        whto = request.GET.get('whto')
-        
-        # return HttpResponse([name, mobileno, line1, line2, city, pincode, dosage, vacancy, slots, whfrom, whto])
-        
-        try:
-            c = centersdb.objects.create(
-                name=name,
-                mobileno=mobileno,
-                line1 = line1,
-                line2 = line2,
-                city = city,
-                pincode = pincode,
-                dosage = dosage,
-                vacancy = vacancy,
-                slots = slots,
-                whfrom = whfrom,
-                whto = whto,
-                )
-            c.save()
-            messages.info(request, 'Successfully created')
-        except Exception as e:
-            messages.error(request, e)
-        return redirect('adminhome')
-    return render(request, 'base/adminadd.html')
-    
-def esendmessage(c, sub, body):
-    a = message.objects.create(
-    users = c.userno,
-    message=body
-    )
-    a.save()
-    body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
-    recipient = c.userno.email
-    send_mail(
-        sub,
-        body,
-        "201501002@rajalaskhmi.edu.com",
-        [recipient]
-    )    
 
+
+@login_required
+def adminhome(request):
+    user = admindetails.objects.get(cookiekey=get_cookie(request))
+    rows = centersdb.objects.all()
+    for row in rows:
+        row.dosage -= entries.objects.filter(Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
+    context = {'name':user.username, 'rows':rows}
+    
+    if request.GET.get('search'):
+        query = request.GET.get('search')
+        rows = centersdb.objects.filter(id=query)
+        context['rows'] = rows
+        messages.info(request, 'Your search results for "'+query+'"')
+    
+    if request.method == 'POST':
+        if request.POST.get('remove'):
+            id = request.POST.get('remove')
+            c = centersdb.objects.get(id=id)
+            sendmessage(request, c, 1)
+            c.delete()
+            messages.info(request, "Deleted Center Successfully of ID:"+id)     
+            return redirect(adminhome)
+            
+            
+    return render(request, 'base/adminhome.html', context)
+    
 @login_required    
 def entriesof(request, id):
+    
     def getslot(rows):
         for row in rows:
             row.slot = slot(row)
         return rows
     
-    idname = centersdb.objects.get(id=id) 
-    rows = entries.objects.filter(centerid=id).order_by('-entrydate')
-    context = {'id':idname.id, 'name':idname.name, 'rows':getslot(rows)}
+    def esendmessage(request, c, sub, body):
+        a = message.objects.create(
+            users = c.userno,
+            message=body
+        )
+        a.save()
+        body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+        recipient = c.userno.email
+        try:
+            send_mail(
+                sub,
+                body,
+                "201501002@rajalaskhmi.edu.com",
+                [recipient]
+            )   
+        except:
+            messages.error(request, "Can't able to send email") 
+    try:    
+        idname = centersdb.objects.get(id=id) 
+        rows = entries.objects.filter(centerid=id).order_by('-entrydate')
+        context = {'id':idname.id, 'name':idname.name, 'rows':getslot(rows)}
+    except:
+        messages.error(request, "There is no Centre with ID "+str(id))
+        return redirect(adminhome)
             
     if request.GET.get('id'):
         ide = request.GET.get('id')
-        c = entries.objects.get(id=ide)
+        try:
+            c = entries.objects.get(id=ide)
+        except:
+            messages.error(request, "There is no entry with ID "+str(ide))
+            return HttpResponseRedirect(id)
         c.delete()
         sub = "Booked slot Cancelled"
-        body = "The Admin have cancelled your booking with ID "+ide+" successfully."
-        esendmessage(c, sub, body)
+        body = "The Admin cancelled your booking with ID "+ide+" successfully."
+        esendmessage(request, c, sub, body)
         messages.info(request, body)
-        return redirect(adminhome)
+        return HttpResponseRedirect(id)
     return render(request, 'base/entriesof.html', context)
 
 
-def modifyfunc(sec,t, f, words):
-    words.append(sec+":\n"+"\t"+str(f)+" -> "+str(t)+"\n")
-    return words
-
 @login_required
 def modify(request, id):
-    row = centersdb.objects.get(id=id)
+    
+    def modifyfunc(sec,t, f, words):
+        words.append(sec+":\n"+"\t"+str(f)+" -> "+str(t)+"\n")
+        return words
+    try:
+        row = centersdb.objects.get(id=id)
+    except:
+        messages.error(request, "There is no centre with the ID: "+id)
+        return redirect(adminhome)
+    
     context = {'row':row}
-    flag = 0
+    flag =  dosage = 0
     words = []
-    dosage = 0
     name = row.name
+    
     if request.GET.get('name'):
         words =  modifyfunc('Name', request.GET.get('name'), row.name, words)
         row.name=request.GET.get('name')
@@ -256,17 +239,57 @@ def modify(request, id):
         
     if words or dosage:
         if words:
-            sendmessage(row, 0, name, words)
+            sendmessage(request, row, 0, name, words)
             if flag:
                 rows = entries.objects.filter(centerid=row)
                 cnt = rows.count()
                 row.dosage+=cnt
                 rows.delete()
         row.save()
-        messages.info(request, "Modified Center Successfully of ID:"+id)     
+        messages.info(request, "Modified Center with ID "+str(id)+ "Successfully.")     
         return redirect(adminhome)
     
     return render(request, 'base/modify.html', context)
+
+
+
+@login_required
+def adminadd(request):
+    if request.GET.get('name'):
+        name = request.GET.get('name')
+        mobileno = request.GET.get('mobileno')
+        line1 = request.GET.get('line1')
+        line2 = request.GET.get('line2')
+        city = request.GET.get('city')
+        pincode = request.GET.get('pincode')
+        dosage = request.GET.get('dosage')
+        vacancy = request.GET.get('vacancy')
+        slots = request.GET.get('slots')
+        whfrom = request.GET.get('whfrom')
+        whto = request.GET.get('whto')
+        
+        try:
+            c = centersdb.objects.create(
+                name=name,
+                mobileno=mobileno,
+                line1 = line1,
+                line2 = line2,
+                city = city,
+                pincode = pincode,
+                dosage = dosage,
+                vacancy = vacancy,
+                slots = slots,
+                whfrom = whfrom,
+                whto = whto,
+                )
+            c.save()
+            messages.info(request, 'Successfully created')
+        except Exception:
+            messages.error(request, "An unexpected error happened. Please try again.")
+        return redirect('adminhome')
+    return render(request, 'base/adminadd.html')
+    
+
 
 
 @login_required

@@ -16,14 +16,16 @@
     <table class="table table">
         <thead>
             <tr class="d-flex">
-                <th class="col-11"><h3>Messages</h3></th>
+                <th class="col-1"><h3>Time</h3></th>
+                <th class="col-10"><h3>Messages</h3></th>
                 <th class="col-1"><button class="btn btn-danger" type="submit">Delete</button></th>
             </tr>
         </thead>
         {% for msg in msgs %}
             <tbody>
                 <tr class="d-flex">
-                    <td class="col-11">{{msg.message}}</td>
+                    <td class="col-1">{{msg.entrydatetime}}</td>
+                    <td class="col-10">{{msg.message}}</td>
                     <td class="col-1"><input class="checkbox-style " type="checkbox" name="id" value="{{msg.id}}"><td>
                 </tr>
             </tbody>

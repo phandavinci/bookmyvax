@@ -15,13 +15,15 @@
     <h3>Booked Vaccinations</h3>
     <h5>You can cancel any upcoming vaccination before the time of  booked slot on a particular date</h5>
 
-    
     <form method='GET'>
-        <div class="col-sm-3 d-flex align-items-baseline">
+        </div><br>
+        <div class="col-sm-4 d-flex align-items-baseline">
             <select class="form-select form-select-lg mb-3" name='filter'>
                 <option value="1" {% if filter == "1" %} selected {% endif %} >Today's Bookings</option>
                 <option value="2" {% if filter == "2" %} selected {% endif %} >Future Bookings</option>
                 <option value="3" {% if filter == "3" %} selected {% endif %} >All Bookings since signup</option>
+                <option value="4" {% if filter == "4" %} selected {% endif %} >Vaccinated Bookings</option>
+                <option value="5" {% if filter == "5" %} selected {% endif %} >Booked but not vaccinated</option>
             </select>
             <div class="col-sm-4"><button class='btn btn-primary' type="submit">Apply Filter</button></div>
         </div>

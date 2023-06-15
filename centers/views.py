@@ -21,14 +21,40 @@ def matchingrows(search_string):
     )
     return rows
     
+def slots(id, d):
+    row = centersdb.objects.get(id=id)
+    vacancy = row.vacancy
+    slotno = row.slots
+    whfrom = datetime.combine(d, row.whfrom)
+    whto = datetime.combine(d, row.whto)
+    total = abs((whfrom - whto)/slotno)
+    a = vacancy // slotno
+    result = [a] * slotno
+    result[:vacancy % slotno] = [count + 1 for count in result[:vacancy % slotno]]
+    res = []
+    s = whfrom - total; e = whfrom
+    for i, n in enumerate(result):
+        s += total
+        e = s+total if s+total<whto else whto
+        n-= entries.objects.filter(centerid=id, slot=i, entrydate=d).count()
+        if datetime.now()<=s+(total//4):
+            res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
+    return res    
+    
 def slot(row):
-        slotss = row.centerid.slots
+        slotno = row.centerid.slots
+        is_vaccinated = row.is_vaccinated
         whfrom = datetime.combine(row.entrydate, row.centerid.whfrom)
         whto =  datetime.combine(row.entrydate, row.centerid.whto)
-        total = abs((whfrom - whto)/slotss)
+        total = abs((whfrom - whto)/slotno)
         fr = row.slot*total+datetime.combine(row.entrydate,row.centerid.whfrom)
         to = fr+total if fr+total<whto else whto
-        cancel = 1 if datetime.now() < fr+(total//2) else 0
+        if datetime.now() < fr+(total//2) and is_vaccinated==False:
+            cancel = 1 
+        elif is_vaccinated:
+            cancel = 2
+        else:
+            cancel = 0
         res = {'f':fr.time(), 't':to.time(), 'cancel':cancel}
         return res
     
@@ -50,21 +76,14 @@ def allbookingfilter(cookie):
         row.slot = slot(row)
     return rows
 
-def slots(id, d):
-    row = centersdb.objects.get(id=id)
-    vacancy = row.vacancy
-    slotss = row.slots
-    whfrom = datetime.combine(d, row.whfrom)
-    whto = datetime.combine(d, row.whto)
-    total = abs((whfrom - whto)/slotss)
-    a = vacancy // slotss
-    result = [a] * slotss
-    result[:vacancy % slotss] = [count + 1 for count in result[:vacancy % slotss]]
-    res = []; s = whfrom - total; e = whfrom
-    for i, n in enumerate(result):
-        s += total
-        e = s+total if s+total<whto else whto
-        n-= entries.objects.filter(centerid=id, slot=i, entrydate=d).count()
-        if datetime.now()<=s+(total//4):
-            res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
-    return res
+def vaccinatedbookings(cookie):
+    rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno, is_vaccinated=True).order_by('-entrydate')
+    for row in rows:
+        row.slot = slot(row)
+    return rows
+
+def bookednotvaccinated(cookie):
+    rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno, is_vaccinated=False, entrydate__lt=date.today()).order_by('-entrydate')
+    for row in rows:
+        row.slot = slot(row)
+    return rows
