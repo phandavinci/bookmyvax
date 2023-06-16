@@ -21,7 +21,7 @@
                 <th>Vacancy</th>
                 <th>Slots</th>
                 <th>Remaining booking</th>
-                <th class='col-1'>Confirm</th>
+                <th class='col-1'>Book</th>
             </tr>
         </thead>
         {% for detail in details %}
@@ -41,14 +41,21 @@
                     </td>
                     <td>{{detail.rem}}</td>
                     <input type="hidden" name="date" value="{{ detail.date }}"/> 
-                    <td>
-                        {% if detail.vacancy and detail.rem %}
-                            <button class='btn btn-link' type='submit'>Confirm</button>
-                        {% else %}
-                            <button class='btn btn-link' disabled>Full</button>
-                        {% endif %}
+                    {% if detail.vacancy and detail.rem %}
+                    
+                    <td>    
+                        <button class='btn btn-link' type='submit'>Book</button>
                     </td>
-                </form>
+                    </form>
+                    {% elif detail.vacancy %}
+                    <td>
+                        <button class='btn btn-link' disabled>Reached the Limit</button>
+                    </td>
+                    {% else %}
+                    <td>
+                        <button class='btn btn-link' disabled>Full</button>
+                    </td>
+                    {% endif %}
             </tr>
         </tbody>
         {% endfor %}

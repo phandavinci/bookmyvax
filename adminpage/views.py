@@ -57,7 +57,7 @@ def sendmessage(request, c, dele, name='', words=[]):
             message=body
         )
         a.save()
-        body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
+        body = "Hey "+row.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
         recipient = row.email
         try:
             send_mail(
@@ -108,7 +108,7 @@ def adminhome(request):
     user = admindetails.objects.get(cookiekey=get_cookie(request))
     rows = centersdb.objects.all()
     for row in rows:
-        row.dosage -= entries.objects.filter(Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
+        row.dosage -= entries.objects.filter(Q(centerid=row.id) & Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
     context = {'name':user.username, 'rows':rows}
     
     if request.GET.get('search'):

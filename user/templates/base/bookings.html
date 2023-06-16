@@ -36,6 +36,8 @@
     <thead>
         <tr>
             <th>Entry ID</th>
+            <th>Booker's Name</th>
+            <th>Booker's Number</th>
             <th>Centre ID</th>
             <th>Name</th>
             <th>Address</th>
@@ -51,6 +53,8 @@
     <tbody>
         <tr>
             <td>{{ row.id }}</td>
+            <td>{{row.name}}</td>
+            <td>{{row.mobileno}}</td>
             <td>{{row.centerid.id}}</td>
             <td>{{row.centerid.name}}</td>
             <td>{{row.centerid.line1}}, {{row.centerid.line2}}</td>
@@ -62,11 +66,8 @@
             <td>
             <form method="get">
                 <input type="hidden" name="id" value="{{ row.id }}">
-                {% if row.slot.cancel %}
-                    <button class="btn btn-link">Cancel</button>
-                {% else %}
-                    <button class='btn btn-link' disabled>Expired</button>
-                {% endif %}
+                <input type="hidden" name="filter" value="{{ filter }}"/>
+                <button class="btn btn-link"{% if row.slot.cancel.0 %} disabled {% endif %}  >{{row.slot.cancel.1}}</button>
             </form>
         </tr>
     </tbody>

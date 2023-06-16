@@ -69,7 +69,7 @@ def usersignin(request):
     if get_cookie(request):
         try:
             user = UserSignIn.objects.get(cookiekey=get_cookie(request))
-            return redirect('userhome')
+            return redirect(userhome)
         except:
             return render(request, 'base/usersignin.html')
     if request.method == 'POST':
@@ -119,7 +119,7 @@ def usersignup(request):
             messages.info(request, 'Successfully created')
         except:
             messages.error(request, 'User already exist please login')
-        return redirect('usersignin')
+        return redirect(usersignin)
     return render(request, 'base/usersignup.html')
 
 
@@ -128,7 +128,7 @@ def userhome(request):
     userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
     rows = centersdb.objects.all()
     for row in rows:
-        row.dosage -= entries.objects.filter(Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
+        row.dosage -= entries.objects.filter(Q(centerid=row.id) & Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
     unread_count = message.objects.filter(users=userno, is_read=False).count()
     context = {'name':userno.name, 'rows':rows, 'unread_count':unread_count}
     
@@ -139,10 +139,65 @@ def userhome(request):
         if query!='':
             messages.info(request, 'Your search results for "'+query+'"')
         
+    if request.method=='POST':
+        try:
+            myself = request.POST.get('myself')
+            id = request.POST.get('id')
+        except:
+            messages.error(request, 'Error occured, Please try again')
+            return redirect(userhome)
+
+        if myself=='1':
+            request.session['centreid'] = id
+            request.session['name'] = userno.name
+            request.session['mobileno'] = userno.mobileno
+            request.session['age'] = userno.age
+            request.session['gender'] = userno.gender
+            request.session['bloodgroup'] = userno.bloodgroup
+            return redirect(book)
+        else:
+            request.session['centreid'] = id
+            request.session['name'] = request.POST.get('name')
+            request.session['mobileno'] = request.POST.get('mobileno')
+            request.session['age'] = request.POST.get('age')
+            request.session['gender'] = request.POST.get('gender')
+            request.session['bloodgroup'] = request.POST.get('bloodgroup')
+            return redirect(book)
+            
+        
     return render(request, 'base/userhome.html', context)
 
 @login_required    
-def book(request, id):
+def book(request):
+    try:
+        id = request.session.get('centreid')
+        name = request.session.get('name')
+        mobileno = request.session.get('mobileno')
+        age = request.session.get('age')
+        gender = request.session.get('gender')
+        bloodgroup = request.session.get('bloodgroup')
+    except:
+        messages.error(request, "Can't able to fetch details. Try again.")
+        return redirect(userhome)
+    
+    chk = entries.objects.filter(mobileno=mobileno) 
+    if chk.count():
+        try:
+            chk.get(is_vacciated=True)
+            messages.info(request, "You are already Vaccinated")
+            return redirect(userhome)
+            
+        except:
+            a = chk.filter(entrydate__gt=date.today()).count()
+            if a:
+                messages.info(request, "You already booked a Vaccine")
+                return redirect(userhome)
+            a = chk.get(entrydate=date.today())
+            b = slot(a)
+            if datetime.combine(a.entrydate, b['t'])>datetime.now():
+                messages.info(request, "You already booked a Vaccine")
+                return redirect(userhome)
+                
     try:
         row = centersdb.objects.get(id=id)
     except:
@@ -170,21 +225,36 @@ def book(request, id):
         slott = request.GET.get('slot')
         datee = datetime.strptime(request.GET.get('date'), "%B %d, %Y").strftime("%Y-%m-%d")
         entry = 4-entries.objects.filter(userno=userno, entrydate = datee).count()
+        
         if entry:
             c = entries.objects.create(
                 userno = userno,
                 centerid = row,
+                name= name,
+                mobileno = mobileno,
+                age = age,
+                gender = gender,
+                bloodgroup = bloodgroup,
                 slot = slott,
                 entrydate = datee
             )
             c.save()
             s = slot(entries.objects.get(id=c.id))
             sub = "Slot booked successfully"
-            body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" at "+datee+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully."
+            body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" for "+datee+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully, for the user named "+ c.name+" with Mobile number "+c.mobileno
             sendmessage(request, entries.objects.get(id=c.id), sub, body)
             messages.success(request, body)
         else:
             messages.error(request, 'you have exceed the limit for the day '+ datee+ ' of centre '+ row.name + ' with id '+ str(row.id))
+        try:
+            request.session.pop('centreid', None)
+            request.session.pop('name', None)
+            request.session.pop('mobileno', None)
+            request.session.pop('age', None)
+            request.session.pop('gender', None)
+            request.session.pop('bloodgroup', None)
+        except:
+            return redirect(userhome)    
         return redirect(userhome)
     
     context['unread_count'] = message.objects.filter(users=userno, is_read=False).count()
@@ -196,7 +266,7 @@ def bookings(request):
     cookiekey = get_cookie(request)
     userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
     unread_count = message.objects.filter(users=userno, is_read=False).count()
-    context = {'rows':mybookingsfilter(cookiekey), 'unread_count':unread_count}
+    context = {'rows':mybookingsfilter(cookiekey), 'unread_count':unread_count, 'filter':'1'}
     
     if request.GET.get('filter'):
         filter = request.GET.get('filter')
@@ -214,16 +284,24 @@ def bookings(request):
             
     if request.GET.get('id'):
         id = request.GET.get('id')
+        filter = request.GET.get('filter')
         try:
             c = entries.objects.get(id=id)
         except:
             messages.error(request, "There is no entry with ID: "+str(id))
             return render(request, 'base/bookings.html', context)
-        c.delete()
+        
+        if slot(c)['cancel'][0] == 0: 
+            c.delete()
+        else:
+            messages.error(request, "You can't cancel the booking with ID: "+str(id)+", because it is expired or already vaccinated.")
+            return render(request, 'base/bookings.html', context)
+        
         sub = "Booked slot Cancelled"
         body = "you have cancelled booking with ID "+id+" successfully."
         sendmessage(request, c, sub, body)
         messages.info(request, body)
+        return HttpResponseRedirect('bookings?filter='+filter)
     return render(request, 'base/bookings.html', context)
     
 
@@ -239,12 +317,18 @@ def msg(request):
         m.is_read = True
         m.save()
         
-    if request.GET.getlist('id'):
-        id = request.GET.getlist('id')
-        for i in id:
-            temp = message.objects.get(id=i)
+    if request.GET.get('all'):
+        all = request.GET.get('all')
+        if all=='1':
+            temp=message.objects.filter(users=userno)
             temp.delete()
-        messages.success(request, "Selected messages deleted successfully")
+            messages.success(request, "All messages deleted successfully")
+        else:
+            id = request.GET.getlist('id')
+            for i in id:
+                temp = message.objects.get(id=i)
+                temp.delete()
+            messages.success(request, "Selected messages deleted successfully")
         return redirect(msg)
     
     context = {'msgs':msgs.order_by('-entrydatetime')}

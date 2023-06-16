@@ -23,6 +23,11 @@ class centersdb(models.Model):
 class entries(models.Model):
     centerid = models.ForeignKey(centersdb, on_delete=models.CASCADE)
     userno = models.ForeignKey(UserSignIn, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    mobileno = models.CharField(max_length=10)
+    age = models.CharField(max_length=2)
+    gender = models.CharField(max_length=1)
+    bloodgroup = models.CharField(max_length=3)
     slot = models.IntegerField()
     is_vaccinated = models.BooleanField(default=False)
     entrydate = models.DateField(default=date.today, verbose_name='EntryDate')

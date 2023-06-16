@@ -50,40 +50,40 @@ def slot(row):
         fr = row.slot*total+datetime.combine(row.entrydate,row.centerid.whfrom)
         to = fr+total if fr+total<whto else whto
         if datetime.now() < fr+(total//2) and is_vaccinated==False:
-            cancel = 1 
+            cancel = [0, 'Cancel'] 
         elif is_vaccinated:
-            cancel = 2
+            cancel = [1, 'Vaccinated']
         else:
-            cancel = 0
+            cancel = [2, 'Expired']
         res = {'f':fr.time(), 't':to.time(), 'cancel':cancel}
         return res
     
 def mybookingsfilter(cookie):
-    rows = entries.objects.filter(Q(entrydate=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    rows = entries.objects.filter(Q(entrydate=today) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
     for row in rows:
         row.slot = slot(row)
     return rows
 
 def futurebookingfilter(cookie):
-    rows = entries.objects.filter(Q(entrydate__gt=today), userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    rows = entries.objects.filter(Q(entrydate__gt=today) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
     for row in rows:
         row.slot = slot(row)
     return rows
 
 def allbookingfilter(cookie):
-    rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno).order_by('-entrydate')
+    rows = entries.objects.filter(Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno))
     for row in rows:
         row.slot = slot(row)
     return rows
 
 def vaccinatedbookings(cookie):
-    rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno, is_vaccinated=True).order_by('-entrydate')
+    rows = entries.objects.filter(Q(is_vaccinated=True) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
     for row in rows:
         row.slot = slot(row)
     return rows
 
 def bookednotvaccinated(cookie):
-    rows = entries.objects.filter(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno, is_vaccinated=False, entrydate__lt=date.today()).order_by('-entrydate')
+    rows = entries.objects.filter(Q(is_vaccinated=False) & Q(entrydate__lt=date.today()) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
     for row in rows:
         row.slot = slot(row)
     return rows
