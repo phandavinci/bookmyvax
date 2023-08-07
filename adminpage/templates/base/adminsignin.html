@@ -24,9 +24,9 @@
             </ul>
             {% endif %}
         <p>Username</p>
-        <input type="text" name="username" placeholder="Enter Username" required autofocus/>
+        <input type="text" class='form-control' name="username" placeholder="Enter Username" required autofocus/>
         <p>Password</p>
-        <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="password" class='form-control' name="password" placeholder="Enter Password" required>
         <input type="submit" value='Sign In'>
     </form>
     
@@ -34,6 +34,6 @@
         You are a User?
         <a href="{% url 'usersignin' %}"><b>SignIn Here</b></a>
     </div>
-</div>
+</div> 
 </body>
 </html>

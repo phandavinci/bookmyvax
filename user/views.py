@@ -3,8 +3,9 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn, message
 from centers.models import entries, centersdb
+from django.core.exceptions import ObjectDoesNotExist
 from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter, vaccinatedbookings, bookednotvaccinated, slot
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
 import base64
 import hashlib
 from functools import wraps
@@ -54,12 +55,14 @@ def sendmessage(request, c, sub, body):
     a.save()
     body = "Hey "+c.userno.name+",\n\t"+body+"\n\t\t\t\tThank You\nBest Regards,\nCVB Team"
     recipient = c.userno.email
+    connection = get_connection()
     try:
         send_mail(
             sub,
             body,
             "201501002@rajalaskhmi.edu.com",
-            [recipient]
+            [recipient],
+            connection=connection
         )
     except:
         messages.error(request, "Can't able to send email")
@@ -183,7 +186,7 @@ def book(request):
     chk = entries.objects.filter(mobileno=mobileno) 
     if chk.count():
         try:
-            chk.get(is_vacciated=True)
+            chk.get(is_vaccinated=True)
             messages.info(request, "You are already Vaccinated")
             return redirect(userhome)
             
@@ -223,7 +226,7 @@ def book(request):
     
     if request.GET.get('slot'):
         slott = request.GET.get('slot')
-        datee = datetime.strptime(request.GET.get('date'), "%B %d, %Y").strftime("%Y-%m-%d")
+        datee = datetime.strptime(request.GET.get('date'), "%b. %d, %Y").strftime("%Y-%m-%d")
         entry = 4-entries.objects.filter(userno=userno, entrydate = datee).count()
         
         if entry:

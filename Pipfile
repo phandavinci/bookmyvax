@@ -10,6 +10,10 @@ django-extensions = "*"
 pydot = "*"
 pytz = "*"
 tzdata = "*"
+django-environ = "*"
+python-decouple = "*"
+python-dotenv = "*"
+pygraphviz = "*"
 
 [dev-packages]
 
