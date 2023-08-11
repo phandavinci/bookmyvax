@@ -44,11 +44,8 @@
         <td>
         <form method="get">
             <input type="hidden" name="id" value="{{ row.id }}">
-            {% if row.slot.cancel %}
-                <button class="btn btn-link">Cancel</button>
-            {% else %}
-                <button class='btn btn-link' disabled>Expired</button>
-            {% endif %}
+            <input type="hidden" name="filter" value="{{ filter }}"/>
+            <button class="btn btn-link"{% if row.slot.cancel.0 %} disabled {% endif %}  >{{row.slot.cancel.1}}</button>
         </form>
         </td>
     </tr>
