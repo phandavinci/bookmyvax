@@ -83,7 +83,11 @@ def vaccinatedbookings(cookie):
     return rows
 
 def bookednotvaccinated(cookie):
-    rows = entries.objects.filter(Q(is_vaccinated=False) & Q(entrydate__lt=date.today()) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
+    res = []
+    rows = entries.objects.filter(Q(is_vaccinated=False) & Q(entrydate__lte=date.today()) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
     for row in rows:
         row.slot = slot(row)
-    return rows
+        if row.slot['cancel'][0]==2:
+            res.append(row)
+    return res
+
