@@ -5,8 +5,6 @@
 
 A web application for covid vaccination booking
 
-
-
 ## Badges
 
 
@@ -17,6 +15,8 @@ A web application for covid vaccination booking
 [![Tzdata](https://img.shields.io/badge/Tzdata-%2A-blue)](https://pypi.org/project/tzdata/)
 [![Python Dotenv](https://img.shields.io/badge/Python%20Dotenv-%2A-blue)](https://pypi.org/project/python-dotenv/)
 
+
+**Hosted Site: http://phanda13.pythonanywhere.com/**
 
 ## Installation
 
