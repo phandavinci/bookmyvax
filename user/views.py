@@ -191,22 +191,6 @@ def book(request):
     if chk.filter(entrydate__gt=date.today()) or (todaybooked and datetime.combine(todaybooked, slot(chk.get(entrydate = todaybooked))['t'])>datetime.now()):
         messages.info(request, "You already booked a Vaccine")
         return redirect(userhome)
-
-        # if chk.filter(is_vaccinated=True).count():
-        #     messages.info(request, "You are already Vaccinated")
-        #     return redirect(userhome)
-        # a = chk.filter(entrydate__gt=date.today()).count()
-        # if a:
-        #     messages.info(request, "You already booked a Vaccine")
-        #     return redirect(userhome)
-        # try:
-        #     chk.get(entrydate=date.today())
-        #     a = chk.get(entrydate=date.today())
-        #     b = slot(a)
-        #     if datetime.combine(a.entrydate, b['t'])>datetime.now():
-        #         messages.info(request, "You already booked a Vaccine")
-        #         return redirect(userhome)
-        # except:
                 
                 
     try:
