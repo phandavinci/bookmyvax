@@ -46,6 +46,7 @@
             <th>Working Hours</th>
             <th>Date</th>
             <th>Slot</th>
+            <th>QR</th>
             <th>Cancel</th>
         </tr>
     </thead>
@@ -63,12 +64,14 @@
             <td>{{row.centerid.whfrom}} to {{row.centerid.whto}}</td>
             <td>{{row.entrydate}}</td>
             <td>{{row.slot.f}} - {{row.slot.t}}</td>
+            <td>{{row.qr}}</td>
             <td>
-            <form method="get">
-                <input type="hidden" name="id" value="{{ row.id }}">
-                <input type="hidden" name="filter" value="{{ filter }}"/>
-                <button class="btn btn-link"{% if row.slot.cancel.0 %} disabled {% endif %}  >{{row.slot.cancel.1}}</button>
-            </form>
+                <form method="get">
+                    <input type="hidden" name="id" value="{{ row.id }}">
+                    <input type="hidden" name="filter" value="{{ filter }}"/>
+                    <button class="btn btn-link"{% if row.slot.cancel.0 %} disabled {% endif %}  >{{row.slot.cancel.1}}</button>
+                </form>
+            </td>
         </tr>
     </tbody>
     {% endfor %}
