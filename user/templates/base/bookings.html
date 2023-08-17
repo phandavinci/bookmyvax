@@ -64,7 +64,12 @@
             <td>{{row.centerid.whfrom}} to {{row.centerid.whto}}</td>
             <td>{{row.entrydate}}</td>
             <td>{{row.slot.f}} - {{row.slot.t}}</td>
-            <td>{{row.qr}}</td>
+            <td>
+                <form method="post">
+                    <input type="hidden" name="id" value="{{ row.id }}">
+                    <button class="btn btn-link"{% if row.slot.cancel.0 %} disabled {% endif %}  >View QR</button>
+                </form>
+            </td>
             <td>
                 <form method="get">
                     <input type="hidden" name="id" value="{{ row.id }}">
