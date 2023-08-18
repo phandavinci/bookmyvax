@@ -14,6 +14,7 @@ django-environ = "*"
 python-decouple = "*"
 python-dotenv = "*"
 pygraphviz = "*"
+pillow = "*"
 
 [dev-packages]
 
