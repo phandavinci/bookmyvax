@@ -11,6 +11,7 @@ import hashlib
 from functools import wraps
 from datetime import datetime, time, date, timedelta
 from django.db.models import Q
+import pyqrcode, png
 
 def index(request):
     return render(request, 'index.html')
@@ -220,7 +221,13 @@ def book(request):
         slott = request.GET.get('slot')
         datee = datetime.strptime(request.GET.get('date'), "%b. %d, %Y").strftime("%Y-%m-%d")
         entry = 4-entries.objects.filter(userno=userno, entrydate = datee).count()
-        
+        # generating qr code
+        try:
+            next_id = entries.objects.all().order_by("-id")[0].id
+        except:
+            next_id=1
+        key = ''.join([str(ord(i)+1) for i in str(next_id)+str(userno.mobileno)+str(row)+name+str(age)+str(slot)])
+        qr_code = pyqrcode.create(key).png(str(next_id)+str(userno.mobileno))
         if entry:
             c = entries.objects.create(
                 userno = userno,
@@ -231,7 +238,8 @@ def book(request):
                 gender = gender,
                 bloodgroup = bloodgroup,
                 slot = slott,
-                entrydate = datee
+                qr_code = qr_code,
+                entrydate = datee,
             )
             c.save()
             s = slot(entries.objects.get(id=c.id))
