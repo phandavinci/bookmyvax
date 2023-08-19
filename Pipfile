@@ -15,6 +15,8 @@ python-decouple = "*"
 python-dotenv = "*"
 pygraphviz = "*"
 pillow = "*"
+pypng = "*"
+pyqrcode = "*"
 
 [dev-packages]
 
