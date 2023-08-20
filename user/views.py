@@ -227,7 +227,7 @@ def book(request):
         except:
             next_id=1
         key = ''.join([str(ord(i)+1) for i in str(next_id)+str(userno.mobileno)+str(row)+name+str(age)+str(slot)])
-        qr_code = pyqrcode.create(key).png(str(next_id)+str(userno.mobileno))
+        qr_code = pyqrcode.create(key).png(str(next_id)+str(userno.mobileno)+'.png')
         if entry:
             c = entries.objects.create(
                 userno = userno,
