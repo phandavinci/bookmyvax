@@ -30,7 +30,7 @@ class entries(models.Model):
     bloodgroup = models.CharField(max_length=3)
     slot = models.IntegerField()
     is_vaccinated = models.BooleanField(default=False)
-    qr_code = models.ImageField(upload_to='qr_codes', null=True)
+    qr_code = models.ImageField(upload_to='qr_codes/', null=True)
     entrydate = models.DateField(default=date.today, verbose_name='EntryDate')
     def __str__(self):
         return str(self.userno)
