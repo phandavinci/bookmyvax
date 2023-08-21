@@ -226,8 +226,8 @@ def book(request):
             next_id = entries.objects.all().order_by("-id")[0].id
         except:
             next_id=1
-        key = ''.join([str(ord(i)+1)+' ' for i in str(next_id)+str(userno.mobileno)+str(row)+name+str(age)+str(slot)])
-        pyqrcode.create(key).png('media/qr_codes/'+str(next_id)+str(userno.mobileno)+'.png')
+        key = ''.join([str(ord(i)+1)+' ' for i in str(next_id)+str(mobileno)+str(row)+name+str(age)+str(slot)])
+        pyqrcode.create(key).png('media/qr_codes/'+str(next_id)+str(mobileno)+'.png')
         if entry:
             c = entries.objects.create(
                 userno = userno,
@@ -238,7 +238,7 @@ def book(request):
                 gender = gender,
                 bloodgroup = bloodgroup,
                 slot = slott,
-                qr_code = 'qr_codes/'+str(next_id)+str(userno.mobileno)+'.png',
+                qr_code = 'qr_codes/'+str(next_id)+str(mobileno)+'.png',
                 entrydate = datee,
             )
             c.save()
