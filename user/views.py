@@ -343,3 +343,7 @@ def certificatespage(request):
     unread_count = message.objects.filter(users=userno, is_read=False).count()
     context = {'unread_count':unread_count}
     return render(request, "base/certificatespage.html", context)
+
+@login_required
+def qrpage(request):
+    return render(request, 'base/qrpage.html')
