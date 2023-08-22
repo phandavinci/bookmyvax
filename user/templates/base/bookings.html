@@ -64,7 +64,7 @@
             <td>{{row.entrydate}}</td>
             <td>{{row.slot.f}} - {{row.slot.t}}</td>
             <td>
-                <form method="post">
+                <form method="post" action='{% url 'qrpage' %}'>
                     <input type="hidden" name="id" value="{{ row.id }}">
                     <button class="btn btn-link"{% if row.slot.cancel.0 %} disabled {% endif %}  >View QR</button>
                 </form>
