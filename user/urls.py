@@ -10,5 +10,6 @@ urlpatterns = [
     path('book', views.book, name='book'),
     path('msg', views.msg, name='msg'),
     path('certificatespage', views.certificatespage, name='certificatespage'),
+    path('qrpage', views.qrpage, name='qrpage'),
     path('', views.index, name='index')
 ]
