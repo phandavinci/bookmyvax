@@ -222,12 +222,15 @@ def book(request):
         datee = datetime.strptime(request.GET.get('date'), "%b. %d, %Y").strftime("%Y-%m-%d")
         entry = 4-entries.objects.filter(userno=userno, entrydate = datee).count()
         # generating qr code
+        from PIL import Image
         try:
             next_id = entries.objects.all().order_by("-id")[0].id
         except:
             next_id=1
+        path = 'media/qr_codes/'+str(next_id)+str(mobileno)+'.png'
         key = ''.join([str(ord(i)+1)+' ' for i in str(next_id)+str(mobileno)+str(row)+name+str(age)+str(slot)])
-        pyqrcode.create(key).png('media/qr_codes/'+str(next_id)+str(mobileno)+'.png')
+        pyqrcode.create(key, error='H').png(path, scale=5,)
+        Image.open(path).resize((1080, 1080)).save(path)
         if entry:
             c = entries.objects.create(
                 userno = userno,
@@ -305,6 +308,7 @@ def bookings(request):
         sendmessage(request, c, sub, body)
         messages.info(request, body)
         return HttpResponseRedirect('bookings?filter='+filter)
+
     return render(request, 'base/bookings.html', context)
     
 
@@ -346,4 +350,13 @@ def certificatespage(request):
 
 @login_required
 def qrpage(request):
-    return render(request, 'base/qrpage.html')
+    try:
+        context={} 
+        if request.method == 'POST':
+            id = request.POST.get('id')
+            context['qr'] = entries.objects.get(id=id)
+            return render(request, 'base/qrpage.html', context)
+        else:
+            return HttpResponseRedirect('bookings')
+    except:
+        return HttpResponseRedirect('bookings')
