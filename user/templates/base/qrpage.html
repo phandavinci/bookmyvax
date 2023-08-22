@@ -1,7 +1,11 @@
 {% extends 'base/usermain.html' %} 
 {% block content %}
 
-
+<center>
+    <h2>Scan the QR at the centre to get a vaccine</h2>
+    <img src="{{qr.qr_code.url}}" alt="Can't able to open your qr_code please try again" height="25%" width="25%"><br>
+    <a href="{% url 'bookings' %}" class="btn btn-danger">Back</a>
+</center>
 
 
 {% endblock content %}
