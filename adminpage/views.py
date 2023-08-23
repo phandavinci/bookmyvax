@@ -293,5 +293,5 @@ def adminadd(request):
 
 
 @login_required
-def confirmvaccination(request):
-    return render(request, 'base/confirmvaccination.html')
+def scanqr(request):
+    return render(request, 'base/scanqr.html')
