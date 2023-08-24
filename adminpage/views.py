@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import admindetails
-from centers.views import slot, mybookingsfilter, futurebookingfilter, allbookingfilter
+from centers.views import slot, dosagecount
 from centers.models import centersdb, entries
 from user.models import UserSignIn, message
 from functools import wraps
@@ -108,7 +108,7 @@ def adminhome(request):
     user = admindetails.objects.get(cookiekey=get_cookie(request))
     rows = centersdb.objects.all()
     for row in rows:
-        row.dosage -= entries.objects.filter(Q(centerid=row.id) & Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
+        row.dosage -= len(dosagecount(row))
     context = {'name':user.username, 'rows':rows}
     
     if request.GET.get('search'):
