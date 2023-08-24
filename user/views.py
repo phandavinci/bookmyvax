@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn, message
 from centers.models import entries, centersdb
 from django.core.exceptions import ObjectDoesNotExist
-from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter, vaccinatedbookings, bookednotvaccinated, slot
+from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter, vaccinatedbookings, bookednotvaccinated, slot, dosagecount
 from django.core.mail import send_mail, get_connection
 import base64
 import hashlib
@@ -132,7 +132,7 @@ def userhome(request):
     userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
     rows = centersdb.objects.all()
     for row in rows:
-        row.dosage -= entries.objects.filter(Q(centerid=row.id) & Q(entrydate__gte=date.today()) | Q(is_vaccinated=True)).count()
+        row.dosage -= len(dosagecount(row))
     unread_count = message.objects.filter(users=userno, is_read=False).count()
     context = {'name':userno.name, 'rows':rows, 'unread_count':unread_count}
     
