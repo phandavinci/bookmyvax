@@ -2,5 +2,39 @@
 
 {% block content %}
 
-   Under Construction
+<div id='your-qr-result'></div>
+<h1>Scan QR here</h1>
+<div style='display:flex; justify-content:center;'>
+    <div id='my-qr-reader' style='width:50%;'>
+
+    </div>
+</div>
+<script src='https://unpkg.com/html5-qrcode'></script>
+<script>
+    function domReady(fn){
+        if(document.readyState==="complete" || document.readyState==="interactive"){
+            setTimeout(fn, 1)
+        }else{
+            document.addEventListener("DOMContentLoaded", fn)
+        }
+    }
+    domReady(function(){
+        var myqr = document.getElementById('your-qr-result')
+        var lastResult, countResults = 0;
+        function onScanSuccess(decodeText, decodeResult){
+            if(decodeText !== lastResult){
+                ++countResults;
+                lastResult = decodeResult;
+
+                alert("You QR is : " + decodeText, decodeResult)
+                mrqr.innerHTML = 'you scan $(countResults) : $(decodeText)'
+            }
+        }
+
+        var htmlscanner = new Html5QrcodeScanner(
+            'my-qr-reader', {fps:30, qrbox:400}
+        )
+        htmlscanner.render(onScanSuccess)
+    })
+</script>
 {% endblock content %}
