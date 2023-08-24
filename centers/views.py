@@ -91,3 +91,12 @@ def bookednotvaccinated(cookie):
             res.append(row)
     return res
 
+def dosagecount(row):
+    res = []
+    rows = entries.objects.filter(centerid=row)
+    for row in rows:
+        row.slot = slot(row)
+        if row.slot['cancel'][0]==0:
+            res.append(row)
+    return res
+
