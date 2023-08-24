@@ -2,34 +2,5 @@
 
 {% block content %}
 
-<body>
-    <h1>Live QR Code Scanner</h1>
-    <div id="scanner-container"></div>
-    
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-    <script>
-        const scannerContainer = document.getElementById('scanner-container');
-        
-        // Initialize a scanner
-        const scanner = new Instascan.Scanner({ video: scannerContainer });
-        
-        // Add a callback to handle scanned QR codes
-        scanner.addListener('scan', function (content) {
-            alert(`Scanned QR code: ${content}`);
-            // You can perform any other actions with the scanned content here
-        });
-        
-        // Start scanning
-        Instascan.Camera.getCameras().then(function (cameras) {
-            if (cameras.length > 0) {
-                scanner.start(cameras[0]); // Use the first available camera
-            } else {
-                console.error('No cameras found.');
-            }
-        }).catch(function (error) {
-            console.error(error);
-        });
-    </script>
-</body>
-</html>
+   Under Construction
 {% endblock content %}
