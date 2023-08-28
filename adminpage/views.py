@@ -290,8 +290,13 @@ def adminadd(request):
     return render(request, 'base/adminadd.html')
     
 
-
-
 @login_required
 def scanqr(request):
     return render(request, 'base/scanqr.html')
+
+@login_required
+def confirmvaccination(request):
+    qrcode = request.GET.get('qrcode')
+    if qrcode:
+        pass
+    return render(request, 'base/confirmvaccination.html')
