@@ -8,6 +8,6 @@ urlpatterns = [
     path('adminadd', views.adminadd, name='adminadd'),
     path('entriesof/<str:id>', views.entriesof, name='entiresof'),
     path('modify/<str:id>', views.modify, name="modify"),
-    #path('confirmvaccination', views.confirmvaccination, name="confirmvaccination"),
+    path('confirmvaccination', views.confirmvaccination, name="confirmvaccination"),
     path('scanqr', views.scanqr, name='scanqr')
 ]
