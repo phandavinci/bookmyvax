@@ -1,7 +1,10 @@
 {% extends 'base/usermain.html' %}
 
 {% block content %}
-
-    <img src="media/certificates/{{certificate}}" alt="Your certificate not loading. Please retry" height='25%' width='25%'>
-
+    <center>
+        {% if certificate %}
+        <img src="media/certificates/{{certificate}}" alt="Your certificate not loading. Please retry" height='25%' width='25%'>
+        {% else %}
+        <h2>You have no certificates</h2>
+    </center>
 {% endblock content %}
