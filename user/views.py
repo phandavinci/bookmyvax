@@ -228,8 +228,9 @@ def book(request):
         except:
             next_id=1
         path = 'media/qr_codes/'+str(next_id)+str(mobileno)+'.png'
-        key = ''.join([str(ord(i)+1)+' ' for i in str(next_id)+str(mobileno)+str(row)+name+str(age)+str(slot)])
-        pyqrcode.create(key, error='H').png(path, scale=5,)
+        print(row.name)
+        key = ''.join([str(ord(i)+1)+' ' for i in ','.join([str(next_id), str(mobileno), str(userno.name), str(userno.mobileno), str(row.id), str(row.name), str(slot(row)['f'])])])
+        pyqrcode.create(key, error='H').png(path, scale=5)
         Image.open(path).resize((1080, 1080)).save(path)
         if entry:
             c = entries.objects.create(
