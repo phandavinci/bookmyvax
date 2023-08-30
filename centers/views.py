@@ -40,23 +40,26 @@ def slots(id, d):
         if datetime.now()<=s+(total//4):
             res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
     return res    
+
     
+
+
 def slot(row):
-        slotno = row.centerid.slots
-        is_vaccinated = row.is_vaccinated
-        whfrom = datetime.combine(row.entrydate, row.centerid.whfrom)
-        whto =  datetime.combine(row.entrydate, row.centerid.whto)
-        total = abs((whfrom - whto)/slotno)
-        fr = row.slot*total+datetime.combine(row.entrydate,row.centerid.whfrom)
-        to = fr+total if fr+total<whto else whto
-        if datetime.now() < fr+(total//2) and is_vaccinated==False:
-            cancel = [0, 'Cancel'] 
-        elif is_vaccinated:
-            cancel = [1, 'Vaccinated']
-        else:
-            cancel = [2, 'Expired']
-        res = {'f':fr.time(), 't':to.time(), 'cancel':cancel}
-        return res
+    slotno = row.centerid.slots
+    is_vaccinated = row.is_vaccinated
+    whfrom = datetime.combine(row.entrydate, row.centerid.whfrom)
+    whto =  datetime.combine(row.entrydate, row.centerid.whto)
+    total = abs((whfrom - whto)/slotno)
+    fr = row.slot*total+datetime.combine(row.entrydate,row.centerid.whfrom)
+    to = fr+total if fr+total<whto else whto
+    if datetime.now() < fr+(total//2) and is_vaccinated==False:
+        cancel = [0, 'Cancel'] 
+    elif is_vaccinated:
+        cancel = [1, 'Vaccinated']
+    else:
+        cancel = [2, 'Expired']
+    res = {'f':fr.time(), 't':to.time(), 'cancel':cancel}
+    return res
     
 def mybookingsfilter(cookie):
     rows = entries.objects.filter(Q(entrydate=today) & (Q(userno=UserSignIn.objects.get(cookiekey=cookie).mobileno) | Q(mobileno=UserSignIn.objects.get(cookiekey=cookie).mobileno)))
