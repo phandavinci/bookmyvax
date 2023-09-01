@@ -216,22 +216,10 @@ def book(request):
             details.append({'date':d, 'vacancy':v, 'slots':s, 'rem':rem})
             
     context = {'row':row, 'details':details}
-    
     if request.GET.get('slot'):
         slott = request.GET.get('slot')
-        datee = datetime.strptime(request.GET.get('date'), "%b. %d, %Y").strftime("%Y-%m-%d")
+        datee = datetime.strptime(request.GET.get('date'), "%b. %d, %Y")
         entry = 4-entries.objects.filter(userno=userno, entrydate = datee).count()
-        # generating qr code
-        from PIL import Image
-        try:
-            next_id = entries.objects.all().order_by("-id")[0].id
-        except:
-            next_id=1
-        path = 'media/qr_codes/'+str(next_id)+str(mobileno)+'.png'
-        print(row.name)
-        key = ''.join([str(ord(i)+1)+' ' for i in ','.join([str(next_id), str(mobileno), str(userno.name), str(userno.mobileno), str(row.id), str(row.name), str(slot(row)['f'])])])
-        pyqrcode.create(key, error='H').png(path, scale=5)
-        Image.open(path).resize((1080, 1080)).save(path)
         if entry:
             c = entries.objects.create(
                 userno = userno,
@@ -242,17 +230,27 @@ def book(request):
                 gender = gender,
                 bloodgroup = bloodgroup,
                 slot = slott,
-                qr_code = 'qr_codes/'+str(next_id)+str(mobileno)+'.png',
                 entrydate = datee,
             )
-            c.save()
             s = slot(entries.objects.get(id=c.id))
+            # generating qr code
+            from PIL import Image
+            path = 'media/qr_codes/'+str(c.id)+str(mobileno)+'.png'
+            key = ''.join([str(ord(i)+1)+' ' for i in ','.join([str(c.id), str(mobileno), str(userno.name), str(userno.mobileno), str(row.id), str(row.name), str(s['f'])])])
+            pyqrcode.create(key, error='H').png(path, scale=5)
+            Image.open(path).resize((1080, 1080)).save(path)
+
+            #saving qr
+            qrmodifyrow = entries.objects.get(id=c.id)
+            qrmodifyrow.qr_code = 'qr_codes/'+str(c.id)+str(mobileno)+'.png'
+            qrmodifyrow.save()
+
             sub = "Slot booked successfully"
-            body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" for "+datee+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully, for the user named "+ c.name+" with Mobile number "+c.mobileno
+            body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" for "+str(datee)+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully, for the user named "+ c.name+" with Mobile number "+c.mobileno
             sendmessage(request, entries.objects.get(id=c.id), sub, body)
             messages.success(request, body)
         else:
-            messages.error(request, 'you have exceed the limit for the day '+ datee+ ' of centre '+ row.name + ' with id '+ str(row.id))
+            messages.error(request, 'you have exceed the limit for the day '+ str(datee)+ ' of centre '+ row.name + ' with id '+ str(row.id))
         try:
             request.session.pop('centreid', None)
             request.session.pop('name', None)
