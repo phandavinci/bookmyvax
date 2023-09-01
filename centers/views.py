@@ -39,9 +39,7 @@ def slots(id, d):
         n-= entries.objects.filter(centerid=id, slot=i, entrydate=d).count()
         if datetime.now()<=s+(total//4):
             res.append({'slot':i, 'rem':n, 'startime':s.time(), 'endtime':e.time()})
-    return res    
-
-    
+    return res        
 
 
 def slot(row):
