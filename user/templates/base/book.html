@@ -27,7 +27,7 @@
         {% for detail in details %}
         <tbody>
             <tr>
-                <td>{{ detail.date }}</td>
+                <td>{{ detail.date|date:"M. j, Y" }}</td>
                 <td>{{ detail.vacancy }}</td>
                 <form method='GET'>
                     <td>
@@ -40,7 +40,7 @@
                         </select required>
                     </td>
                     <td>{{detail.rem}}</td>
-                    <input type="hidden" name="date" value="{{ detail.date }}"/> 
+                    <input type="hidden" name="date" value="{{ detail.date|date:"M. j, Y" }}"/> 
                     {% if detail.vacancy and detail.rem %}
                     
                     <td>    
