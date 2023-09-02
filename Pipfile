@@ -17,6 +17,7 @@ pygraphviz = "*"
 pillow = "*"
 pypng = "*"
 pyqrcode = "*"
+django-decouple = "*"
 
 [dev-packages]
 
