@@ -300,6 +300,6 @@ def confirmvaccination(request):
     context = {}
     heading = ['id', 'registeredMobileNo', 'accountName', 'accountNumber', 'centreId', 'centreName', 'slot']
     if qrcode:
-        for i, content in enumerate(''.join([chr(i-1) for i in qrcode.split()]).split(',')):
+        for i, content in enumerate(''.join([chr(int(i)-1) for i in qrcode.split()]).split(',')):
             context[heading[i]] = content
     return render(request, 'base/confirmvaccination.html', context)
