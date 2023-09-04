@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import admindetails
-from centers.views import slot, dosagecount
+from centers.views import slot, dosagecount, deleteUnusedQR
 from centers.models import centersdb, entries
 from user.models import UserSignIn, message
 from functools import wraps
@@ -292,14 +292,46 @@ def adminadd(request):
 
 @login_required
 def scanqr(request):
+    deleteUnusedQR()
     return render(request, 'base/scanqr.html')
 
 @login_required
 def confirmvaccination(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        row = entries.objects.get(id=id)
+        row.is_vaccinated = True
+        #make a certificate
+        row.save()
+        sub = 'Vaccination Successfull'
+        body = "You are vaccinated successfully with the entry ID of "+id+"\nThe certificate has sent to your account and can be viewed in the section called certificatespage: http://localhost:8000/certificatespage"
+        from user.views import sendmessage
+        sendmessage(request, row, sub, body)
+        messages.info(request, body)
+        return redirect('scanqr')
     qrcode = request.GET.get('qrcode')
     context = {}
-    heading = ['id', 'registeredMobileNo', 'accountName', 'accountNumber', 'centreId', 'centreName', 'slot']
+    heading = ['id', 'registeredMobileNo', 'accountName', 'accountNumber', 'centreId', 'centreName', 'entryDate', 'slotFr', 'slotTo']
+    context['valid'] = -1
     if qrcode:
-        for i, content in enumerate(''.join([chr(int(i)-1) for i in qrcode.split()]).split(',')):
-            context[heading[i]] = content
+        values = {}
+        try:
+            for i, content in enumerate(''.join([chr(int(i)-1) for i in qrcode.split()]).split(',')):
+                values[heading[i]] = content
+            values['entryDate'] = datetime.strptime(values['entryDate'], "%Y-%m-%d %H:%M:%S").date()
+            values['slotFr'] = datetime.strptime(values['slotFr'], "%H:%M:%S").time()
+            values['slotTo'] = datetime.strptime(values['slotTo'], "%H:%M:%S").time()
+            context['values'] = values
+
+        except:
+            messages.error(request, "Invalid QR code, please try again")
+            return redirect("scanqr")
+        if values['entryDate']>=date.today():
+            if datetime.combine(values['entryDate'], values['slotFr']) <= datetime.now() <= datetime.combine(values['entryDate'], values['slotTo']): 
+                context['valid'] = 1
+            else:
+                context['valid'] = 0
+        else:
+            context['valid'] = 2
+    
     return render(request, 'base/confirmvaccination.html', context)
