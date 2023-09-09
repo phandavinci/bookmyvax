@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSignIn, message
 from centers.models import entries, centersdb
 from django.core.exceptions import ObjectDoesNotExist
-from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter, vaccinatedbookings, bookednotvaccinated, slot, dosagecount
+from centers.views import matchingrows, mybookingsfilter, slots, futurebookingfilter, allbookingfilter, vaccinatedbookings, bookednotvaccinated, slot, dosagecount, deleteUnusedQR
 from django.core.mail import send_mail, get_connection
 import base64
 import hashlib
@@ -61,7 +61,7 @@ def sendmessage(request, c, sub, body):
         send_mail(
             sub,
             body,
-            "201501002@rajalaskhmi.edu.com",
+            "abisheksudhar@gmail.com",
             [recipient],
             connection=connection
         )
@@ -236,7 +236,7 @@ def book(request):
             # generating qr code
             from PIL import Image
             path = 'media/qr_codes/'+str(c.id)+str(mobileno)+'.png'
-            key = ''.join([str(ord(i)+1)+' ' for i in ','.join([str(c.id), str(mobileno), str(userno.name), str(userno.mobileno), str(row.id), str(row.name), str(s['f'])])])
+            key = ''.join([str(ord(i)+1)+' ' for i in ','.join([str(c.id), str(mobileno), str(userno.name), str(userno.mobileno), str(row.id), str(row.name), str(c.entrydate), str(s['f']), str(s['t'])])])
             pyqrcode.create(key, error='H').png(path, scale=5)
             Image.open(path).resize((1080, 1080)).save(path)
 
@@ -244,7 +244,7 @@ def book(request):
             qrmodifyrow = entries.objects.get(id=c.id)
             qrmodifyrow.qr_code = 'qr_codes/'+str(c.id)+str(mobileno)+'.png'
             qrmodifyrow.save()
-
+            deleteUnusedQR()
             sub = "Slot booked successfully"
             body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" for "+str(datee)+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully, for the user named "+ c.name+" with Mobile number "+c.mobileno
             sendmessage(request, entries.objects.get(id=c.id), sub, body)
