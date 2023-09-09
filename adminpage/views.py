@@ -302,6 +302,7 @@ def confirmvaccination(request):
         row = entries.objects.get(id=id)
         row.is_vaccinated = True
         #make a certificate
+        
         row.save()
         sub = 'Vaccination Successfull'
         body = "You are vaccinated successfully with the entry ID of "+id+"\nThe certificate has sent to your account and can be viewed in the section called certificatespage: http://localhost:8000/certificatespage"
