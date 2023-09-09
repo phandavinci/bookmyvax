@@ -5,6 +5,7 @@ from .models import centersdb, entries
 from user.models import UserSignIn
 from django.db.models import Count
 from datetime import date, datetime, timedelta
+import os
 
 # Create your views here.
 
@@ -101,3 +102,9 @@ def dosagecount(row):
             res.append(row)
     return res
 
+def deleteUnusedQR():
+    rows = entries.objects.exclude(entrydate__gte=date.today())
+    for row in rows:
+        image_path = 'media/qr_codes/'+str(row.id)+str(row.mobileno)+'.png'
+        if os.path.exists(image_path):
+            os.remove(image_path)
