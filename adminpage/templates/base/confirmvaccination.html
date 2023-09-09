@@ -1,16 +1,80 @@
 {% extends 'base/adminmain.html' %}
 
-
 {% block content %}
+
+<script>
+    // Reusable countdown function
+    function startCountdownAndRedirect(seconds, redirectUrl) {
+        let countdown = seconds;
+
+        function updateCountdown() {
+            countdown--;
+            const countdownDisplay = document.getElementById('countdown');
+            countdownDisplay.textContent = countdown;
+            if (countdown <= 0) {
+                window.location.href = redirectUrl; // Redirect after countdown
+            }
+        }
+
+        // Initial countdown display
+        updateCountdown();
+
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+    }
+
+    // Call the function with desired values
+</script>
 
 <center style='text-align:center;'>
 
+{% if valid != -1 %}    
+
+    <h2><b>Your Details</b></h2><br>
+    ID: {{values.id}}<br>
+    registeredMobileNo: {{values.registeredMobileNo}}<br>
+    AccountName: {{values.accountName}}<br>
+    AccountNumber: {{values.accountNumber}}<br>
+    CentreID: {{values.centreId}}<br>
+    CentreName: {{values.centreName}}<br>
+    EntryDate: {{values.entryDate}}<br>
+    SlotFrom: {{values.slotFr}}<br>
+    SlotTo: {{values.slotTo}}<br><br>
+
+    {% if valid == 1 %}
+
+        <form method="POST">
+            <input type="hidden" name="id" value='{{values.id}}'>
+            <center class='form-signin'>
+                <input type="submit" class="w-100 btn btn-lg btn-success" value='Confirm'>
+            </center>
+        </form>
+    {% elif valid == 2%}
+        <h1>This entry is expired</h1>
+        <p><b>Redirecting in <span id="countdown">10</span> seconds</b></p>
+        <script>
+            // Call the function with desired values
+            startCountdownAndRedirect(10, 'scanqr');
+        </script>
+    {% else %}
+        <h3>Please come for the slot that you have booked</h3>
+        <p><b>Redirecting in <span id="countdown">10</span> seconds</b></p>
+        <script>
+            // Call the function with desired values
+            startCountdownAndRedirect(10, 'scanqr');
+        </script>
+    {% endif %}
+
+{% else %}
+
+    <h1>This QR code doesn't valid, please make sure you are scanning with the correct QR code</h1>
+    <p><b>Redirecting in <span id="countdown">10</span> seconds</b></p>
+    <script>
+        // Call the function with desired values
+        startCountdownAndRedirect(10, 'scanqr');
+    </script>
+{% endif %}
 
 </center>
-{{id}}
-{{registeredMobileNo}}
-
-{{accountName}}{{accountNumber}}{{centreId}} {{centreName}} {{slot}}
-
 
 {% endblock content %}
