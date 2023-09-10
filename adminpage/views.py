@@ -12,6 +12,7 @@ from django.db.models import Q
 import base64
 import hashlib
 
+deleteUnusedQR()
 
 def hash_password(password):
     secret_key = 'sidfht34985ty34q8h58934y54hsdfngshtgdsgfn45023'
@@ -292,7 +293,6 @@ def adminadd(request):
 
 @login_required
 def scanqr(request):
-    deleteUnusedQR()
     return render(request, 'base/scanqr.html')
 
 @login_required
@@ -302,7 +302,45 @@ def confirmvaccination(request):
         row = entries.objects.get(id=id)
         row.is_vaccinated = True
         #make a certificate
-        
+        from PIL import Image, ImageDraw, ImageFont
+
+        # Load the certificate template
+        template_path = 'static/images/Covid Certificate award.png'
+        certificate = Image.open(template_path)
+
+        # Create a drawing context
+        draw = ImageDraw.Draw(certificate)
+
+        # Load a font for the text
+        font_path = 'static/fonts/times new roman.ttf'  # Replace with the path to your desired font
+        font_size = 60
+        font = ImageFont.truetype(font_path, font_size)
+
+        # Define text content
+        name = row.name
+        dateofcert = str(row.entrydate)
+        entryid = '#'+str(id)+str(row.mobileno)
+
+        # Define text positions
+        name_position = (870, 880)
+        dateofcert_position = (875, 1080)
+        entryid_position = (290, 1195)
+
+        # Define text color
+        text_color = (0, 0, 0)  # Black color
+
+        # Add text to the certificate
+        draw.text(name_position, name, fill=text_color, font=font)
+        draw.text(dateofcert_position, dateofcert, fill=text_color, font=font)
+        draw.text(entryid_position, entryid, fill=text_color, font=font)
+
+        saving_path = "certificates/"+entryid+'.png'
+        # Save the generated certificate
+        certificate.save("media/"+saving_path)
+
+        # Close the certificate image
+        certificate.close()
+        row.certificate = saving_path   
         row.save()
         sub = 'Vaccination Successfull'
         body = "You are vaccinated successfully with the entry ID of "+id+"\nThe certificate has sent to your account and can be viewed in the section called certificatespage: http://localhost:8000/certificatespage"
