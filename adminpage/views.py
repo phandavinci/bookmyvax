@@ -319,7 +319,7 @@ def confirmvaccination(request):
         # Define text content
         name = row.name
         dateofcert = str(row.entrydate)
-        entryid = '#'+str(id)+str(row.mobileno)
+        entryid = str(id)+str(row.mobileno)
 
         # Define text positions
         name_position = (870, 880)
@@ -332,7 +332,7 @@ def confirmvaccination(request):
         # Add text to the certificate
         draw.text(name_position, name, fill=text_color, font=font)
         draw.text(dateofcert_position, dateofcert, fill=text_color, font=font)
-        draw.text(entryid_position, entryid, fill=text_color, font=font)
+        draw.text(entryid_position, '#'+entryid, fill=text_color, font=font)
 
         saving_path = "certificates/"+entryid+'.png'
         # Save the generated certificate
