@@ -26,13 +26,19 @@
             document.addEventListener("DOMContentLoaded", fn)
         }
     }
+
     domReady(function(){
         var myqr = document.getElementById('your-qr-result');
         var lastResult, countResults = 0;
+        var scanningEnabled = true; // Add a flag to control scanning
+
         function onScanSuccess(decodeText, decodeResult){
-            if(decodeText !== lastResult){
+            if(scanningEnabled && decodeText !== lastResult){
                 ++countResults;
                 lastResult = decodeResult;
+
+                // Disable scanning to prevent further scans
+                scanningEnabled = false;
 
                 // Redirect to confirmvaccination.html with the QR code result
                 window.location.href = `confirmvaccination?qrcode=${decodeText}`;
@@ -41,8 +47,10 @@
 
         var htmlscanner = new Html5QrcodeScanner(
             'my-qr-reader', {fps:30, qrbox:400}
-        )
+        );
+
         htmlscanner.render(onScanSuccess);
     });
 </script>
+
 {% endblock content %}
