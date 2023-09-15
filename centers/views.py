@@ -98,13 +98,13 @@ def dosagecount(row):
     rows = entries.objects.filter(centerid=row)
     for row in rows:
         row.slot = slot(row)
-        if row.slot['cancel'][0]==0:
+        if row.slot['cancel'][0]!=2:
             res.append(row)
     return res
 
 def deleteUnusedQR():
     rows = entries.objects.exclude(entrydate__gte=date.today())
     for row in rows:
-        image_path = 'media/qr_codes/'+str(row.id)+str(row.mobileno)+'.png'
-        if os.path.exists(image_path):
-            os.remove(image_path)
+        qr_image_path = 'media/qr_codes/'+str(row.id)+str(row.mobileno)+'.png'
+        if os.path.exists(qr_image_path):
+            os.remove(qr_image_path)
