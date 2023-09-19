@@ -13,6 +13,8 @@ from datetime import datetime, time, date, timedelta
 from django.db.models import Q
 import pyqrcode, png
 
+deleteUnusedQR()
+
 def index(request):
     return render(request, 'index.html')
 
@@ -244,7 +246,6 @@ def book(request):
             qrmodifyrow = entries.objects.get(id=c.id)
             qrmodifyrow.qr_code = 'qr_codes/'+str(c.id)+str(mobileno)+'.png'
             qrmodifyrow.save()
-            deleteUnusedQR()
             sub = "Slot booked successfully"
             body = "You have booked the centre "+row.name+" with ID "+str(row.id)+" for "+str(datee)+" of slot "+str(s['f'])+" - "+str(s['t'])+" successfully, for the user named "+ c.name+" with Mobile number "+c.mobileno
             sendmessage(request, entries.objects.get(id=c.id), sub, body)
@@ -345,6 +346,25 @@ def certificatespage(request):
     userno = UserSignIn.objects.get(cookiekey=get_cookie(request))
     unread_count = message.objects.filter(users=userno, is_read=False).count()
     context = {'unread_count':unread_count}
+    mycertificate = {}
+    try:
+        mycertificaterow = entries.objects.get(Q(mobileno = userno.mobileno) & Q(is_vaccinated=True))
+        mycertificate['name'] = userno.name
+        mycertificate['mobileno'] = userno.mobileno
+        mycertificate['certificate'] = mycertificaterow.certificate
+    except:
+        print("no mycertificate")
+    context['mycertificate'] = mycertificate
+    othercertificaterow = entries.objects.filter( ~Q(mobileno = userno.mobileno) & Q(is_vaccinated=True) & Q(userno = userno))
+    othercertificate = []
+    for i in othercertificaterow:
+        temp = {}
+        temp['name'] = i.name
+        temp['mobileno'] = i.mobileno
+        temp['certificate'] = i.certificate
+        othercertificate.append(temp)
+    context['othercertificates'] = othercertificate
+
     return render(request, "base/certificatespage.html", context)
 
 @login_required
