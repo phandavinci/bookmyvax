@@ -1,10 +1,68 @@
 {% extends 'base/usermain.html' %}
 
 {% block content %}
-    <center>
-        {% if certificate %}
-        <img src="media/certificates/{{certificate}}" alt="Your certificate not loading. Please retry" height='25%' width='25%'>
-        {% else %}
-        <h2>You have no certificates</h2>
-    </center>
+    <center><h2>Your certificate</h2></center>
+    {% if mycertificate %}
+        <center>
+            <div class="col" style="width: 20rem">
+                <div class="card shadow-sm">
+                    <img id="certificateImage" src="{{mycertificate.certificate.url}}" alt="Your certificate not loading. Please retry"
+                    style="transform: scale(1); transition: transform 0.3s ease;"
+                    onmouseover="this.style.transform='scale(1.5)';" 
+                    onmouseout="this.style.transform='scale(1)';"
+                    >
+                <div class="card-body">
+                    <p class="card-text">
+                        <b>Name:</b>{{mycertificate.name}} <br>
+                        <b>Mobile No:</b>{{mycertificate.mobileno}} <br>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                    </div>
+                    <a href="{{mycertificate.certificate.url}}" download="covidcertificate.png">
+                        <button class="btn btn-sm btn-outline-secondary">Download</button>
+                    </a>                  
+                    </div>
+                </div>
+                </div>
+            </div>
+        </center>
+    {% else %}
+        <h4>You have no certificate</h4>
+    {% endif %}
+    <hr>
+    <center><h2>Other's certificates</h2></center>
+    {% if othercertificates %}
+            <div style="padding-left: 50px; padding-right: 50px">
+        
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for ocertificate in othercertificates %}
+                    <div class="col" style="width: 20rem;">
+                        <div class="card shadow-sm">
+                            <img id="certificateImage" src="{{ocertificate.certificate.url}}" alt="Your certificate not loading. Please retry"
+                            style="transform: scale(1); transition: transform 0.3s ease;"
+                            onmouseover="this.style.transform='scale(1.5)';" 
+                            onmouseout="this.style.transform='scale(1)';"
+                            >
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <b>Name:</b>{{ocertificate.name}} <br>
+                                        <b>Mobile No:</b>{{ocertificate.mobileno}} <br>
+                                        
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ocertificate.certificate.url}}" download="covidcertificate.png">
+                                        <button class="btn btn-sm btn-outline-secondary">Download</button>
+                                    </a>                  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        {% endfor %}
+                </div>
+            </div>
+    {% else %}
+        <h4>You have no certificates</h4>
+    {% endif %}
+    <hr>
 {% endblock content %}
