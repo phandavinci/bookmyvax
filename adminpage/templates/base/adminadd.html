@@ -5,11 +5,11 @@
         <h1>Add a Centre</h1>
         <form method='GET'>
             Name:<input name='name' type="text" maxlength='50' class="form-control" required/><br>
-            Mobile Number:<input name='mobileno' type="text" maxlength='10' class="form-control" required/><br>
+            Mobile Number:<input name='mobileno' pattern="[0-9]{10}" type="text" maxlength='10' class="form-control" required/><br>
             AddressLine1:<input name='line1' type="text" maxlength='50' class="form-control" required/><br>
             AddressLine2:<input name='line2' type="text" maxlength='50' class="form-control" required/><br>
             City:<input name='city' maxlength='50' class="form-control" required/><br>
-            pincode:<input name='pincode' maxlength='6' class="form-control" required/><br>
+            pincode:<input name='pincode' maxlength='6' pattern='[0-9]{6}' class="form-control" required/><br>
             Dosage: <input name='dosage' class='form-control' required/><br>
             Vacany: <input name='vacancy' class='form-control' required/><br>
             Slots: <input name='slots' class='form-control' required/><br>
